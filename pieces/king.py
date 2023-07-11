@@ -3,6 +3,7 @@ from pieces.rook import Rook
 from pieces.piece import Piece
 
 class King(Piece):
+    """Class King"""
     def __init__(self, board, screen: pygame.Surface, path: str, x: int, y: int, team: 'str'):
 
         # GET IMAGE BASED ON STARTING POSITION
@@ -27,6 +28,7 @@ class King(Piece):
         self.right_castling_rect = self.get_rect(*self.right_castling)
     
     def calculate_moves(self) -> None:
+        """Updates the list of possible moves"""
         self.possible_moves.clear()
 
         # MOVES
@@ -56,6 +58,7 @@ class King(Piece):
 
     
     def check_castling(self, rook_pos: tuple[int, int]) -> bool:
+        """Updates the list of possible moves with castling"""
 
         # CHECK PIECES PROPERTIES
         if self.moved or self.in_check: return False

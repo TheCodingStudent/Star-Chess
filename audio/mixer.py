@@ -6,21 +6,27 @@ from scripts import functions
 
 
 class Mixer:
+    """Mixer is a class to handle all the music and sound of the game"""
     def __init__(self, path: str):
 
         # PROPERTIES
         self.path = os.path.dirname(path)
         self.music_path = functions.resource_path(f'{self.path}/audio/music')
         self.sound_path = functions.resource_path(f'{self.path}/audio/sounds')
+
         # SONGS AND SOUNDS
         self.volume = 1
         self.next_song = ''
         self.playing = False
         self.current_song = ''
+
+        # LOAD SONGS
         self.songs = [
             functions.resource_path(f'{self.music_path}/{song}')
             for song in os.listdir(self.music_path)
         ]
+
+        # LOAD SOUNDS
         self.sounds = {
             sound:pygame.mixer.Sound(functions.resource_path(f'{self.sound_path}/{sound}'))
             for sound in os.listdir(self.sound_path)
@@ -30,10 +36,12 @@ class Mixer:
         pygame.mixer.music.set_endevent(pygame.USEREVENT)
 
     def set_music_volume(self, volume: int) -> None:
+        """Sets the volumen of the music"""
         self.volume = volume/100
         pygame.mixer.music.set_volume(self.volume)
     
     def set_sound_volume(self, volume: int, play_sound: bool=True) -> None:
+        """Sets the volume of the sounds"""
         for sound in self.sounds.values():
             sound.set_volume(volume/100)
         if play_sound: self.play_sound('move.wav')

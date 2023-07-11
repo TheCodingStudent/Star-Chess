@@ -1,3 +1,5 @@
+"""This script is just to compile the game to exe"""
+
 import os
 
 os.system('pyinstaller --noconfirm --onefile --windowed --add-data\

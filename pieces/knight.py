@@ -3,6 +3,7 @@ from pieces.piece import Piece
 
 
 class Knight(Piece):
+    """Class Knight"""
     def __init__(self, board, screen: pygame.Surface, path: str, x: int, y: int, team: 'str'):
 
         # GET IMAGE BASED ON STARTING POSITION
@@ -16,6 +17,7 @@ class Knight(Piece):
         super().__init__(board, screen, path, image, x, y, team, 'CABALLO')
     
     def calculate_moves(self) -> None:
+        """Updates the list of possible moves"""
         self.possible_moves.clear()
 
         # MOVES

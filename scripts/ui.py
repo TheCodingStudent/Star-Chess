@@ -4,6 +4,7 @@ import threading
 
 
 class Star(pygame.Vector2):
+    """A circle that changes its brightness with the time to simulate a star"""
     def __init__(
         self, screen: pygame.Surface,
         min_radius: int, max_radius: int,
@@ -25,10 +26,12 @@ class Star(pygame.Vector2):
         self.time = 0
     
     def show(self) -> None:
+        """Draws a circle on screen"""
         color = (self.brightness, self.brightness, self.brightness)
         pygame.draw.circle(self.screen, color, self, self.radius)
     
     def update(self, dt: float) -> None:
+        """Updates the brightness"""
         self.time += dt * self.sign
         if self.time > self.light_time:
             self.time = self.light_time
@@ -40,6 +43,7 @@ class Star(pygame.Vector2):
 
 
 class StarCluster:
+    """Collection of stars to simulate space"""
     def __init__(
         self, screen: pygame.Surface, num_stars: int,
         min_radius: int=0, max_radius: int=5,
@@ -48,50 +52,55 @@ class StarCluster:
         min_y: int=0, max_y: int=0
     ):
         
+        # PROPERTIES
         if not max_x: max_x = screen.get_width()
         if not max_y: max_y = screen.get_height()
-        self.stars = [
-            Star(
-                screen, min_radius, max_radius, min_time,
-                max_time, min_x, max_x, min_y, max_y
-            ) for _ in range(num_stars)
-        ]
+
+        # STARS
+        properties = (screen, min_radius, max_radius, min_time, max_time, min_x, max_x, min_y, max_y)
+        self.stars = [Star(properties) for _ in range(num_stars)]
     
     def show(self) -> None:
+        """Draws each star on screen"""
         for star in self.stars:
             star.show()
     
     def update(self, dt: float) -> None:
+        """Updates each star based on deltatime"""
         for star in self.stars:
             star.update(dt)
 
 
 class Button:
+    """Class to simulate a button"""
     def __init__(
         self, screen: pygame.Surface, font: pygame.font.Font,
         text: str, x: int, y: int, command: object, position: str='center',
         thread_it: bool=True, color: str='#ffff00', hover_color: str='#7f7f00'
     ):
         
+        # STYLE PROPERTIES
         self.color = color
         self.hover_color = hover_color
+        self.font = font
 
+        # PROPERTIES
         self.screen = screen
+        self.string = text.upper()
         self.text = font.render(text.upper(), True, 'yellow')
         self.rect = self.text.get_rect(**{position:(x, y)})
         self.command = command
-        self.font = font
-        self.string = text.upper()
         self.thread_it = thread_it
-
         self.hovered = False
     
     def show(self):
+        """Draws the text on screen"""
         color = self.color if not self.hovered else self.hover_color
         self.text = self.font.render(self.string, True, color)
         self.screen.blit(self.text, self.rect)
     
     def click(self, event: pygame.event) -> bool:
+        """Checks if the button was clicked and calls a function"""
         if not self.rect.collidepoint(event.pos): return False
         if not self.thread_it: return True
         thread = threading.Thread(target=self.command, daemon=True)
@@ -99,5 +108,6 @@ class Button:
         return True
     
     def hover(self, event: pygame.event) -> None:
+        """Checks if the mouse is over the button"""
         if not self.rect.collidepoint(event.pos): self.hovered = False
         else: self.hovered = True

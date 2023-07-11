@@ -3,7 +3,10 @@ from scripts.ui import Button
 
 
 class OptionsMenu:
+    """Menu for the game configuration options"""
     def __init__(self, screen: pygame.Surface, intro):
+
+        # PROPERTIES
         self.screen = screen
         self.intro = intro
         self.running = True
@@ -13,8 +16,10 @@ class OptionsMenu:
         centery = self.screen.get_height()/2
         height = self.screen.convert(64)
 
+        # VARIABLES
         numbers = tuple(range(101))
 
+        # OPTIONS
         self.options = [
             Option(
                 screen=screen,
@@ -52,12 +57,16 @@ class OptionsMenu:
         )
 
     def leave(self) -> None:
+        """Exits the menu"""
         self.running = False
     
     def update(self, dt: int) -> None:
+        """Updates the animations"""
         self.intro.stars.update(dt)
     
     def main(self) -> None:
+        """Main loop of the menu"""
+
         while self.running:
             self.screen.fill('black')
 
@@ -71,19 +80,23 @@ class OptionsMenu:
 
             pygame.display.update()
             self.dt = self.intro.clock.tick(self.intro.fps)
+
         self.running = True
     
     def click(self, event: pygame.event) -> None:
+        """Checks if any button was clicked"""
         self.exit_button.click(event)
         for option in self.options:
             option.click(event)
     
     def hover(self, event: pygame.event) -> None:
+        """Checks if the mouse is hovering any button"""
         self.exit_button.hover(event)
         for option in self.options:
             option.hover(event)
     
     def show(self) -> None:
+        """Draws everything on screen"""
         self.exit_button.show()
         self.intro.stars.show()
         for option in self.options:
@@ -91,6 +104,7 @@ class OptionsMenu:
 
 
 class Option:
+    """Class to handle an option"""
     def __init__(
             self, screen: pygame.Surface, intro, string: str,
             center: tuple[int, int], options: list,
@@ -113,10 +127,12 @@ class Option:
         self.function = function
         self.render()
 
+        # UI
         self.left_button = Button(screen, intro.font, '-', self.text_rect.left-10, self.text_rect.top, lambda: None, position='topright')
         self.right_button = Button(screen, intro.font, '+', self.text_rect.right+10, self.text_rect.top, lambda: None, position='topleft')
     
     def click(self, event: pygame.event) -> None:
+        """Checks if any button was clicked"""
         if left := self.left_button.click(event): self.index = (self.index-1) % len(self.options)
         if right := self.right_button.click(event): self.index = (self.index+1) % len(self.options)
         if left or right:
@@ -125,14 +141,17 @@ class Option:
             self.render()
     
     def hover(self, event: pygame.event) -> None:
+        """Checks if the mouse is hovering any button"""
         self.left_button.hover(event)
     
     def show(self) -> None:
+        """Draws everything on screen"""
         self.screen.blit(self.text, self.text_rect)
         self.left_button.show()
         self.right_button.show()
     
     def render(self):
+        """Renders the option text and its current option"""
         self.option = self.options[self.index]
         text = f'{self.string}: {self.option}'
         self.text = self.font.render(text, True, 'yellow', 'black')

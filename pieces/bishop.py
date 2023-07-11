@@ -3,6 +3,7 @@ from pieces.piece import Piece
 
 
 class Bishop(Piece):
+    """Class Bishop"""
     def __init__(self, board, screen: pygame.Surface, path: str, x: int, y: int, team: 'str'):
 
         # GET IMAGE BASED ON STARTING POSITION
@@ -14,6 +15,7 @@ class Bishop(Piece):
         super().__init__(board, screen, path, image, x, y, team, 'ALFIL')
     
     def calculate_moves(self) -> None:
+        """Updates the list of possible moves"""
         self.possible_moves.clear()
 
         topleft = [(self.x-i, self.y-i) for i in range(1, min(self.x, self.y)+1)]

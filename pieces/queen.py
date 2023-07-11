@@ -3,6 +3,7 @@ from pieces.piece import Piece
 
 
 class Queen(Piece):
+    """Class Queen"""
     def __init__(self, board, screen: pygame.Surface, path: str, x: int, y: int, team: 'str'):
 
         # GET IMAGE BASED ON STARTING POSITION
@@ -12,6 +13,7 @@ class Queen(Piece):
         super().__init__(board, screen, path, image, x, y, team, 'REINA')
     
     def calculate_moves(self) -> None:
+        """Updates the list of possible moves"""
         self.possible_moves.clear()
         
         # DIRECTIONS

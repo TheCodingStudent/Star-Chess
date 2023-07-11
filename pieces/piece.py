@@ -15,6 +15,7 @@ GREEN = (66, 226, 154)
 YELLOW = (204, 179, 97)
 
 class Piece:
+    """Base class for all pieces"""
     def __init__(self, board, screen: pygame.Surface, path: str, image: str, x: int, y: int, team: str, name: str):
 
         # BOARD
@@ -68,31 +69,39 @@ class Piece:
         self.flag = None
 
     def check_flag(self) -> None:
+        """Applies the function marked as flag"""
         if not self.flag: return
         self.flag = self.flag()
     
     def update_next_turn(self, variable: str, value: object) -> None:
+        """Changes an attribute the next turn"""
         self.flag = lambda: setattr(self, variable, value)
 
     def get_name_rect(self) -> None:
+        """Gets the position of the name"""
         centerx = self.screen.convert(((self.x+0.5)*SQUARE + LEFT))
         bottom = self.screen.convert((self.y*SQUARE + TOP - 5))
         self.name_rect = self.name.get_rect(bottom=bottom, centerx=centerx)
 
     def update(self, dt: int) -> None:
+        """Updates its selection color if it is selected"""
         if self.selected: self.select_anim.update(dt)
 
     def collide(self, pos: tuple[int, int]) -> bool:
+        """Returns if the mouse collides with its rect"""
         return self.rect.collidepoint(pos)
 
     def is_enemy(self, pos: tuple[int, int]) -> bool:
+        """Checks if there is an enemy at the given position"""
         if not (piece := self.board.get(pos)): return False
         return piece.team != self.team
 
     def get_rect(self, x: int, y: int) -> pygame.Rect:
+        """Gets the rect to position the piece"""
         return self.screen.get_rect(self.image, ((x*SQUARE+LEFT), (y*SQUARE+TOP)))
 
     def move(self, pos: tuple[int, int], change_turn: bool=True) -> None:
+        """Moves the piece and updates itself and the board"""
         self.board.move((self.x, self.y), pos, change_turn)
         self.x, self.y = pos
         self.get_name_rect()
@@ -104,35 +113,42 @@ class Piece:
         self.board.mixer.play_sound('move.wav')
 
     def click(self, event: pygame.event) -> None:
+        """Updates the piece if it was selected"""
         self.selected = self.collide(event.pos)
         return self.selected
     
     def hover(self, event: pygame.event) -> None:
+        """Updates the hover if the mouse is on top of the piece"""
         self.hovered = self.collide(event.pos)
 
     def show(self) -> None:
+        """Draws the piece on screen"""
         if self.selected: self.screen.blit(self.select_color, self.rect)
         elif self.hovered: self.screen.blit(self.hover_color, self.rect)
         self.screen.blit(self.image, self.rect)
         
     def show_name(self) -> None:
+        """Draws the name on screen"""
         if not self.hovered: return
         self.screen.blit(self.name_background, self.name_rect)
         self.screen.blit(self.name, self.name_rect)
     
     def show_moves(self) -> None:
+        """Draws the possible moves on screen"""
         if not self.selected: return
         if not self.possible_moves: return
         for rect in self.possible_moves_rects:
             self.screen.blit(self.move_color, rect)
 
     def alpha_rect(self, color: str|tuple[int, int, int], alpha: float) -> pygame.Surface:
+        """Creates a surface with an alpha channel for transparency"""
         surface = pygame.Surface(self.image.get_size(), pygame.SRCALPHA)
         surface.set_alpha(int(255*alpha))
         surface.fill(color)
         return surface
 
     def calculate_moves_rects(self) -> None:
+        """Updates the collision rects for each possible move"""
         self.possible_moves_rects.clear()
         self.possible_moves_rects = [
             self.get_rect(*move)
@@ -140,14 +156,17 @@ class Piece:
         ]
     
     def available(self, pos: tuple[int, int]) -> bool:
+        """Checks if the given position if available on the board"""
         return self.board.available(pos)
 
     def check_moves(self, moves: list[tuple[int, int]]) -> None:
+        """Checks if the given list of moves is legal"""
         for move in moves:
             if self.available(move): self.possible_moves.append(move)
             elif self.is_enemy(move): return self.possible_moves.append(move)
             else: return
     
     def in_attack(self, pos: tuple[int, int]) -> bool:
+        """Checks if the given position is attack by the enemy"""
         return self.board.in_attack(pos)
 

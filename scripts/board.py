@@ -76,9 +76,11 @@ class Board:
         self.reset()
     
     def leave(self) -> None:
+        """Marks the running flag to exit the board"""
         self.running = False
 
     def reset(self) -> None:
+        """Resets the board to its initial state"""
         screen = self.screen.screen
 
         # BOARD
@@ -128,28 +130,90 @@ class Board:
         self.winner = None
         self.winner_rect = None
 
+    # HELPING METHODS
+    def win(self) -> None:
+        """Updates the winner"""
+
+        # GET MESSAGE
+        winner = 'la republica' if self.current=='white' else 'el imperio'
+        message = f'{winner} gana!'.upper()
+
+        # GET TEXT AND SURFACES
+        self.winner = self.font.render(message, True, 'white')
+        self.winner_background = pygame.Surface(self.winner.get_size())
+        self.winner_background.fill('black')
+        self.winner_background.set_alpha(127)
+        center = (self.screen.width/2, self.screen.height/2)
+        self.winner_rect = self.winner_background.get_rect(center=center)
+
+    def change_turn(self) -> None:
+        """Manages the logic of changing turn"""
+        self.current = 'black' if self.current == 'white' else 'white'
+
+    def kill(self, pos: tuple[int, int]) -> None:
+        """Removes the piece from the board and plays its sound"""
+        if not (piece := self.get(pos)): return
+        if self.current == 'white': self.black_pieces.remove(piece)
+        if self.current == 'black': self.white_pieces.remove(piece)
+        self.all_pieces.remove(piece)
+        self.board[pos[1]][pos[0]] = None
+        self.mixer.play_sound('capture.wav')
+
+        # CHECK IF MATE
+        if isinstance(piece, King): self.win()
+
+    def move(self, start: tuple[int, int], end: tuple[int, int], change_turn: bool=True) -> None:
+        """Manages the logic of moving a piece"""
+        (x0, y0), (x1, y1) = start, end
+        self.kill(end)
+
+        # SWAP THE PIECE AND CHANGE TURN IF NEEDED
+        self.board[y0][x0], self.board[y1][x1] = self.board[y1][x1], self.board[y0][x0]
+        if not change_turn: return
+        self.change_turn()
+    
+    def hover(self, event: pygame.event) -> None:
+        """Manages the logic for hovering the board or piece"""
+        current_pieces = getattr(self, f'{self.current}_pieces')
+        self.exit_button.hover(event)
+        for piece in current_pieces:
+            piece.hover(event)
+    
+    def update(self) -> None:
+        """Updates all the visual elements"""
+        self.left_stars.update(self.dt)
+        self.right_stars.update(self.dt)
+        self.turn_anim.update(self.dt)
+        for piece in self.all_pieces:
+            piece.update(self.dt)
+
     def in_attack(self, pos: tuple[int, int]) -> bool:
+        """Checks if the given position is in attack"""
         ...
 
     def in_bounds(self, pos: tuple[int, int]) -> bool:
+        """Checks if the given position is legal"""
         x, y = pos
         if (x < 0) or (x > 7): return False
         if (y < 0) or (y > 7): return False
         return True
 
     def available(self, pos: tuple[int, int]) -> bool:
+        """Checks if the given position is available"""
         x, y = pos
         if not self.in_bounds(pos): return False
         return self.board[y][x] is None
 
     def get(self, pos: tuple[int, int]):
+        """Returns the piece at the given position"""
         x, y = pos
         if not self.in_bounds(pos): return None
         return self.board[y][x]
 
     def show(self) -> None:
+        """Draws the board on screen"""
 
-        # BACKGROUND
+        # SHOW BACKGROUND
         self.screen.blit(self.background, self.rect)
         self.left_stars.show()
         self.right_stars.show()
@@ -170,6 +234,7 @@ class Board:
         else:
             top_color = bottom_color = RED if self.current=='white' else BLUE
 
+        # DRAWS THE BOARD INDICATORS
         self.screen.draw_circle(top_color, TOPLEFT, 20)
         self.screen.draw_circle(top_color, TOPRIGHT, 20)
         self.screen.draw_circle(bottom_color, BOTTOMLEFT, 20)
@@ -184,6 +249,7 @@ class Board:
         self.screen.blit(self.winner, self.winner_rect)
 
     def click(self, event: pygame.event) -> None:
+        """Manages all the logic when mouse is clicked"""
 
         # CHECK CLICK ON UI
         if self.exit_button.click(event): return
@@ -262,40 +328,8 @@ class Board:
             self.selected.calculate_moves()
             return self.selected.calculate_moves_rects()
     
-    def kill(self, pos: tuple[int, int]) -> None:
-        if not (piece := self.get(pos)): return
-        if self.current == 'white': self.black_pieces.remove(piece)
-        if self.current == 'black': self.white_pieces.remove(piece)
-        self.all_pieces.remove(piece)
-        self.board[pos[1]][pos[0]] = None
-        self.mixer.play_sound('capture.wav')
-
-        # CHECK IF MATE
-        if isinstance(piece, King): self.win()
-
-    def move(self, start: tuple[int, int], end: tuple[int, int], change_turn: bool=True) -> None:
-        x0, y0 = start
-        x1, y1 = end
-        self.kill(end)
-
-        self.board[y0][x0], self.board[y1][x1] = self.board[y1][x1], self.board[y0][x0]
-        if not change_turn: return
-        self.current = 'black' if self.current == 'white' else 'white'
-    
-    def hover(self, event: pygame.event) -> None:
-        current_pieces = getattr(self, f'{self.current}_pieces')
-        self.exit_button.hover(event)
-        for piece in current_pieces:
-            piece.hover(event)
-    
-    def update(self) -> None:
-        self.left_stars.update(self.dt)
-        self.right_stars.update(self.dt)
-        self.turn_anim.update(self.dt)
-        for piece in self.all_pieces:
-            piece.update(self.dt)
-    
     def main(self) -> None:
+        """Main loop of the board"""
 
         # MAIN LOOP
         while self.running:
@@ -321,6 +355,7 @@ class Board:
         self.mixer.stop()
 
     def intro(self) -> None:
+        """Loop for the intro animation"""
 
         # MAIN LOOP
         time = 0
@@ -361,17 +396,3 @@ class Board:
             time += self.dt
         
         self.main()
-    
-    def win(self) -> None:
-
-        # GET MESSAGE
-        winner = 'la republica' if self.current=='white' else 'el imperio'
-        message = f'{winner} gana!'.upper()
-
-        # GET TEXT AND SURFACES
-        self.winner = self.font.render(message, True, 'white')
-        self.winner_background = pygame.Surface(self.winner.get_size())
-        self.winner_background.fill('black')
-        self.winner_background.set_alpha(127)
-        center = (self.screen.width/2, self.screen.height/2)
-        self.winner_rect = self.winner_background.get_rect(center=center)

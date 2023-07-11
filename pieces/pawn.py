@@ -3,6 +3,7 @@ from pieces.piece import Piece
 
 
 class Pawn(Piece):
+    """Class Pawn"""
     def __init__(self, board, screen: pygame.Surface, path: str, x: int, y: int, team: 'str'):
         
         # GET IMAGE BASED ON STARTING POSITION
@@ -29,6 +30,7 @@ class Pawn(Piece):
         self.allow_right_passant = True
     
     def calculate_moves(self) -> None:
+        """Updates the list of possible moves"""
         self.possible_moves.clear()
 
         # FRONT
@@ -58,6 +60,7 @@ class Pawn(Piece):
             self.can_right_passant = True
     
     def move(self, pos: tuple[int, int], change_turn: bool = True) -> None:
+        """Pawn must update its passant when moved"""
         super().move(pos, change_turn)
 
         # UPDATE PASSANT

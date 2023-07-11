@@ -241,3 +241,16 @@
     
     *   Se modifico el archivo de Board, Functions, Star Chess, Menu, Intro, Mixer,
         ahora si que todo necesito remodelacion
+    
+    9:24pm
+    *   Llego la hora de hacer un repositorio de github, para proteger el codigo,
+        para que la gente puede conocerlo y verlo internamente y ademas
+        no tener que estar subiendo exes a todos lados
+    
+    9:28pm
+    *   Empieza la tarea que no queria realizar, pero si la gente vera el codigo
+        por diversion entonces valdra la pena que este documentado
+    
+    10:05pm
+    *   Tomo media hora pero ya esta documentado todo, ya cada funcion que agregue
+        espero documentarla en el momento.

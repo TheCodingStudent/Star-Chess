@@ -9,6 +9,7 @@ from scripts.resolution import ResolutionScreen
 
 
 class Intro:
+    """Manages the start menu"""
     def __init__(self, screen: pygame.Surface, mixer: Mixer, path: str):
 
         # SCREEN CONFIGURATION
@@ -64,9 +65,11 @@ class Intro:
         self.options_menu = OptionsMenu(self.screen, self)
 
     def leave(self) -> None:
+        """Exits all the game"""
         self.no_continue = True
     
     def open_server(self) -> None:
+        """Opens the socket server"""
         server = Server()
         thread = threading.Thread(target=server.receive, daemon=True)
         thread.start()
@@ -74,12 +77,15 @@ class Intro:
         self.status_message_rect = self.status_message.get_rect(left=self.left, bottom=self.bottom)
     
     def join_server(self) -> None:
+        """Joins to a socket server"""
         self.running = False
 
     def options(self) -> None:
+        """Activates the flag to show options"""
         self.show_options = True
 
     def main(self) -> None:
+        """Main loop for the intro"""
 
         # MUSIC
         intro_path =  functions.resource_path(f'{self.path}/audio/music/Star Wars.mp3')
@@ -111,10 +117,12 @@ class Intro:
         return True
     
     def click(self, event: pygame.event) -> None:
+        """Checks if any button was pressed"""
         for button in self.buttons:
             button.click(event)
     
     def show(self) -> None:
+        """Draws everything on screen"""
         self.stars.show()
         self.screen.blit(self.logo, self.logo_rect)
         if not self.show_buttons: return
@@ -122,10 +130,12 @@ class Intro:
         if self.status_message: self.screen.blit(self.status_message, self.status_message_rect)
     
     def update(self) -> None:
+        """Updates the animations"""
         if self.logo_rect.top > self.top: self.logo_rect = self.logo_rect.move(0, -10)
         elif not self.show_buttons: self.show_buttons = True
         self.stars.update(self.dt)
     
     def hover(self, event: pygame.event) -> None:
+        """Checks if the mouse is hovering any button"""
         for button in self.buttons:
             button.hover(event)

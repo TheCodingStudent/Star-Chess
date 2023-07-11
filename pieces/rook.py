@@ -3,6 +3,7 @@ from pieces.piece import Piece
 
 
 class Rook(Piece):
+    """Class Rook"""
     def __init__(self, board, screen: pygame.Surface, path: str, x: int, y: int, team: 'str'):
 
         # GET IMAGE BASED ON STARTING POSITION
@@ -14,6 +15,7 @@ class Rook(Piece):
         super().__init__(board, screen, path, image, x, y, team, 'TORRE')
     
     def calculate_moves(self) -> None:
+        """Updates the list of possible moves"""
         self.possible_moves.clear()
 
         # DIRECTIONS
