@@ -58,15 +58,15 @@ class Mixer:
     def play(self, loops: int=0) -> None:
         """Plays the songs"""
         self.playing = True
-        pygame.mixer.music.play(loops=loops)
+        pygame.mixer.music.load(self.current_song)
         pygame.mixer.music.set_volume(self.volume)
+        pygame.mixer.music.play()
     
     def start(self, song=None) -> None:
         """Inits the mixer"""
         if not song: song = random.choice(self.songs)
-        pygame.mixer.music.load(song)
-        pygame.mixer.music.set_volume(self.volume)
         self.current_song = song
+        self.play()
         self.load_queue()
 
     def stop(self) -> None:
@@ -77,6 +77,7 @@ class Mixer:
         """Loads the next song and updates the new"""
         self.current_song = self.next_song
         self.load_queue()
+        self.play()
 
     def play_sound(self, sound: str) -> None:
         """Plays a sound"""

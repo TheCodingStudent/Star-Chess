@@ -173,6 +173,7 @@ class InstructionsMenu(TextMenu):
             "4. Una vez haya algun ganador la forma de reiniciar el tablero",
             "es presionando la tecla de espacio.",
             " ",
+            "5. La musica puede ser cambiada con la tecla n",
             " ",
             "En caso de cualquier error por favor reportarlo haciendo uso",
             "del boton de reportar error en el menu de inicio. Te llevara",

@@ -320,3 +320,27 @@
     *   Ahora al haber un ganador se genera confeti, esta fue idea de Javier
     *   Cambie de nuevo la cantidad de estrellas
     *   Me volvieron a sugerir añadir mas personas y configuraciones
+
+    3:15pm
+    *   Ajuste el confeti
+    *   Cambie el numero de particulas a 500
+    *   Ahora al ganar hay un sonido (no es el definitivo)
+    *   Parada tecnica
+
+    4:59pm
+    *   Viendo Sherlock me di cuenta de que la musica llegaba a su fin cuando
+        todas las canciones fueron reproducidas ya se rompia el bucle.
+        Era un error al momento de cargar canciones.
+    *   Al arreglarlo tambien introduje el cambiar la cancion con la tecla n
+        haciendo referencia a next
+    
+    *   El boton de salir del tablero ya funciona durante la animacion de
+        entrada. Aparecio un nuevo error, al salir de tablero hacia el menu
+        la musica no es la de Star Wars
+    
+    5:14pm
+    *   El mixer fue modificado
+    *   Ya funciona la musica como debe
+    
+    5:23pm
+    *   DEJA YA DE POSTERGAR EL ONLINE

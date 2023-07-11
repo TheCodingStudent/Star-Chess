@@ -148,6 +148,8 @@ class Board:
         center = (self.screen.width/2, self.screen.height/2)
         self.winner_rect = self.winner_background.get_rect(center=center)
 
+        self.mixer.play_sound('win.mp3')
+
     def change_turn(self) -> None:
         """Manages the logic of changing turn"""
         self.current = 'black' if self.current == 'white' else 'white'
@@ -344,11 +346,15 @@ class Board:
             self.screen.fill('black')
             for event in pygame.event.get():
                 if event.type == pygame.QUIT: self.running = False
+                elif event.type == pygame.USEREVENT: self.mixer.next()
+                elif event.type == pygame.MOUSEMOTION: self.exit_button.hover(event)
+                elif event.type == pygame.MOUSEBUTTONDOWN: self.exit_button.click(event)
+                elif event.type == pygame.KEYDOWN:
+                    if event.key == pygame.K_n: self.mixer.next()
 
                 # INTERACT UNLESS THERE IS A WINNER
                 if not self.winner:
-                    if event.type == pygame.USEREVENT: self.mixer.next()
-                    elif event.type == pygame.MOUSEMOTION: self.hover(event)
+                    if event.type == pygame.MOUSEMOTION: self.hover(event)
                     elif event.type == pygame.MOUSEBUTTONDOWN: self.click(event)
 
                 # ONLY DETECT SPACEBAR TO RESET BOARD 
@@ -359,8 +365,6 @@ class Board:
             self.show()
             pygame.display.update()
             self.dt = self.clock.tick(self.fps)
-
-        self.mixer.stop()
 
     def intro(self) -> None:
         """Loop for the intro animation"""
