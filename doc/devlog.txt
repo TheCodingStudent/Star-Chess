@@ -1,0 +1,243 @@
+- 05/07/23 1:57pm
+    *   Empiezo con las bases del juego, la estructura central. La idea es ahora
+        manejar un sistema de archivos que permita la facil manipulacion y no
+        perder tiempo leyendo un archivo de 1000 lineas.
+
+- 06/07/23 7:35pm
+    *   Implemente el sistema del mixer, ahora puedo reproducir en bucle musica
+        con un queue y ademas mandar llamar sonidos en cualquier momento.
+        Ademas ya se agrego musica a la intro.
+    *   Descargue ya todas las canciones de Star Wars en 8 bits
+
+- 07/07/23 12:52pm
+    *   Ahora las estrellas se manejan en un cluster para minimizar el codigo
+        y poder reutilizarlo en el tablero.
+    *   Ya esta la mecanica basica de click, hover
+
+- 08/07/23 12:31am
+    *   Ya funciona el peon y la torre
+    *   Añadi bastantes funciones nuevas al tablero
+    *   En teoria ahora las piezas solo deben de tener un metodo para calcular
+        los movimientos posibles
+    *   Ya funciona lo de mover piezas y maneja lo de comer
+    *   Algun dia documentare cada funcion de este proyecto
+
+- 08/07/23
+    5:52pm
+    *   Ya esta el caballo
+    *   La funcion de click deberia ya de cubrir todos los posibles casos
+    *   Aun mas funciones han sido agregadas a las piezas y al tablero
+    *   La funcion para checar los limites del tablero fue arreglada
+        (habia puesto una x en donde debia ir una y)
+    
+    6:14pm
+    *   Ahora hay una animacion para la pieza seleccionada
+    *   Bug de teletransportacion arreglado
+    *   Ya no puedes clickear movimientos de piezas no seleccionadas
+
+    6:25pm
+    *   Ahora las piezas estan en una carpeta y cada pieza tiene su archivo de
+        codigo, esto hara mi vida mas sencilla con la organizacion (espero)
+    *   Hay una nueva carpeta para guardar la configuracion de los proximos
+        menus a agregar
+    *   El mixer fue movido a la nueva carpeta audio
+
+    8:32pm
+    *   Resulta que no puedes nombrar una carpeta code, python lo reconoce como
+        un modulo ya existente y hay conflictos, la soluciono fue llamarlo
+        scripts. La idea de tener todo en carpetas es para que sea mas facil
+        exportarlo a un ejecutable
+    
+    11:43pm
+    *   Resolvi un error de acomodo en la intro debido a no multiplicar por el
+        aspect ratio
+    
+    *   Elementos esenciales
+        -   Enroque
+        -   Coronacion
+        -   En passant
+
+        -   Jaque
+        -   Jaque mate
+        -   Rey ahogado   
+
+    *   Cosas por agregar
+        -   Indicador de turno
+        -   Indicador de movimientos previos
+        -   Repasar partida
+        -   Tutorial
+        -   Sonidos especiales al seleccionar pieza
+    
+    *   Errores
+        -   Los rectangulos estan desfasados debido a la escala
+
+- 09/07/23
+    12:11pm
+    *   Empezare con el movimiento de enroque, las reglas son:
+        *   Solo se puede hacer si la torre o el rey no se han movido   ✔
+        *   No debe haber piezas en el camino                           ✔
+        *   El rey no debe estar en Jaque                               ✔
+        *   Los cuadros que abarque no deben estar siendo atacados      ✔
+        *   Se puede hacer enroque aunque la torre este siendo atacada  ✔
+    
+    1:39pm
+    *   Despues de comer ya funciona el enroque
+    *   Ahora ya funcion de mover toma un parametro para controlar si cambiamos
+        el turno o no, de esta manera el enroque ya pasa de turno correctamente
+    *   Trabajare en el en passant, las reglas son:
+        *   La pieza a capturar debe haberse movido 2 lugares en su         ✔
+            primer turno
+        *   El movimiento debe hacerse en el turno siguiente, si no pierde  ✔
+            la oportunidad
+        *   El peon debe estar en la quinta fila si es blanco o en la       ✔
+            cuarta si es negro
+        *   La pieza se coloca en la misma columna que la pieza capturada   ✔
+    
+    1:52pm
+    *   Estaba trabajando en el peon cuando me llego la idea de ponerle una
+        etiqueta a cada pieza que muestre que pieza es, para quienes no estan
+        familiarizados aun
+    *   Tambien vere que puedo hacer para el error visual de los cuadros de los
+        movimientos debido a la resolucion
+    *   Ademas agregare un indicador rapido para el turno
+
+    2:23pm
+    *   Ya funciona el indicador del turno, tiene la animacion de ir subiendo y
+        bajando el brillo. Lo cual derivo en crear DeltaValue, de esta manera 
+        ya puedo crear variables que cambien en base al deltatime
+    *   Ahora hare lo de los nombres
+    *   Empiezo a creer que seria una buena idea crear una clase para manejar
+        lo de resolucion
+
+    3:14pm
+    *   Que raro es ver la computadora a 1920x1080 otra vez, pero ya esta el
+        sistema para adaptar la pantalla, ahora al interactuar con este sistema
+        puedo trabajar con coordendas originales y se transladan al tamaño
+        correcto segun la resolucion
+    *   Seuguire con los nombres de las piezas
+
+    3:35pm
+    *   Pues ya estan las etiquetas con los nombres, el sistema de conversion
+        resulto muy util
+    *   Llevo todo el dia con el celular apagado como experimento y debo
+        admitir que tengo el impulso constante de tomarlo y ver la hora,
+        redes o mensajes. Es curioso
+        Pero resulto mega productivo
+    *   Hora de dejar de posponer el movimiento en passant
+
+    3:55pm
+    *   Ligero break
+
+    4:21pm
+    *   Pues en passant ya funciona, solo esta el detalle de que no deberias de
+        poder hacerlo despues del turno correspondiente
+    
+    4:34pm
+    *   Parece ser que si he adquirido algunos trucos a lo largo de todo el tiempo
+        que programe desde la ultima vez que intente hacer el ajedrez.
+        Ya esta totalmente implementado el passant, la solucion fue que al momento
+        de calcular los movimientos ya puedo poner flags, entonces cuando el
+        peon se mueve 2 casillas activa una flag para que al siguiente turno
+        cambie su atributo de "moved_twice" a False, asi cuando pase un turno
+        el peon que podia aplicar en passant ya no podra debido a que la pieza
+        enemiga ya no cuenta como que movio doble
+
+    *   Deberia trabajar en la coronacion o en los menus, tambien esta pendiente
+        arreglar el orden de dibujado, acabo de notar que no siempre se coloca
+        el movimiento para comer encima de la pieza
+    
+    4:43pm
+    *   Ya esta arreglado el orden de dibujado
+
+    4:54pm
+    *   Corregi el comando para convertir en exe el juego (recordar activar las
+        escenas iniciales cuando haga ejecutable)
+    *   Trabajare en cuando un jugar gane (de momento sera comer al rey)
+
+    5:23pm
+    *   Ya funciona la etapa de ganador
+    *   Arregle varios errores menores
+    *   Ahora hare los menus
+
+    5:37pm
+    *   La musica de la intro ya esta en bucle
+    *   Falta actualizar la intro para el nuevo sistema de resolucion
+
+    5:50pm
+    *   Ya la intro esta lista y se ajusta a la resolucion deseada
+    
+    POBRE DE QUIEN LE TOQUE DOCUMENTAR TODO ESTO JAJAJA
+
+    6:17pm
+    *   Ahora entiendo por que Alva Majo dice que hacer menus es horrible
+    *   Tengo que agregar simbolos a la fuente de 8 bits
+    *   Sera algo que le pedire a Demian, pero pretendo no prender el telefono
+
+    6:39pm
+    *   Ya me harte, lo del menu ya esta avanzado solo para agregar las acciones
+        a los botones para cambiar los ajustes. Aunque aun tengo que averiguar
+        como interrumpir el bucle principal para que surja el menu de opciones,
+        el boton normalmente funciona con threads pero como ambos bucles agregan
+        graficos pues se pelean jaja
+    
+    *   Si me surgen ganas agregare los sonidos al momento de mover, de hecho
+        creo que lo hare de una vez para probar el mixer, sumado a que no
+        deberia ser complejo, la pieza ya detecta cuando ha sido movida entonces
+        es cuestion de pedirle al mixer que cargue el sonido
+    
+    6:52pm
+    *   Fue divertido agregar los sonidos jaja, le dan vida al juego.
+    *   Por otra parte tendre que hacer una funcion logaritmica para el sonido
+        100 -> 1
+        0 -> 0
+        puede que log10(x)-1 funcione
+    *   Compilare y podre mandarselo a Demian y Javier y acostarme un rato
+
+    8:52pm
+    *   Habia un error al momento de colocar el texto del ganador, ya esta
+        arreglado
+    *   Mayra me acaba de hacerme dar cuenta de agregar un boton para salir,
+        una especie de X o algo asi
+    
+    9:10pm
+    *   Ya esta agregado el boton para salir
+    *   Tambien esta arreglado el error del en passant, no se si es una solucion
+        elegante pero ahora se actualizan las posiciones del passant cuando
+        se llama la funcion move
+    *   Estoy pensando en agregar una funcion en la clase board que haga el
+        cambio de turno, de esta manera puedo actualizar las piezas actuales
+        y obtener los movimientos
+
+    - IDEAS DE MAYRA
+        *   Boton para salir
+        *   Customizar las piezas y sus personajes
+        *   Opcion para mostrar los nombres de las piezas
+    
+10/07/23
+    7:31pm
+    *   Acabo de resolver lo de los bucles de los menus
+    *   Tambien ahora usare + y - para cambiar las opciones
+    *   Ahora implementare el ajuste del mixer, esto involucrara tambien añadir
+        la configuracion en un json
+    
+    7:46pm
+    *   Estoy en racha, ahora al salir del tablero tambien te regresa al menu
+        principal del juego, esto da la sensacion de ser mas profesional
+    
+    8:31pm
+    *   Ahora la musica ya esta conectada entre la intro y el juego principal,
+        siempre la intro empieza con la musica inicial de Star Wars y despues
+        ya aplica canciones aleatorias, esto da "continuidad"
+    *   Ya funciona el sistema para la configuracion, cree una clase que es
+        compartida entre el tablero y la intro para acceder a la configuracion
+        y siendo una clase puedo almacenar la configuracion y no tener que cargar
+        cada que quiero guardar.
+    *   El menu de opciones ya funciona
+    *   Estoy pensando en la idea de invocar el menu de opciones en medio de la
+        partida en lugar de tener que salir, pensando en eso tambien se me ocurrio
+        que debe haber una opcion de reanudar partida
+    *   Javier me dijo que estaria chill que al haber un ganador los "leds" del
+        tablero indicaran el ganador tambien, ya esta hecho
+    
+    *   Se modifico el archivo de Board, Functions, Star Chess, Menu, Intro, Mixer,
+        ahora si que todo necesito remodelacion
