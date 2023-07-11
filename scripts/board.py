@@ -24,8 +24,8 @@ BOTTOMLEFT = (495, 999)
 BOTTOMRIGHT = (1424, 999)
 
 # COLORS
-GREY = (65, 63, 65)
 RED = pygame.Vector3(217, 0, 8)
+GREY = pygame.Vector3(65, 63, 65)
 BLUE = pygame.Vector3(16, 115, 230)
 
 
@@ -52,12 +52,12 @@ class Board:
 
         # CLOCK
         self.clock = pygame.time.Clock()
-        self.running = True
-        self.fps = 60
+        self.fps = 144
         self.dt = 0
 
         # ANIMATIONS
-        self.turn_anim = functions.DeltaValue(duration=2500, min_value=0.25, max_value=1)
+        self.turn_anim = functions.DeltaValue(duration=2000, min_value=0, max_value=1)
+        self.confeti = ui.Confeti(screen)
 
         # UI
         self.exit_button = ui.Button(
@@ -71,9 +71,6 @@ class Board:
             color='#ff0000',
             hover_color='#7f0000'
         )
-
-        # LOAD BOARD
-        self.reset()
     
     def leave(self) -> None:
         """Marks the running flag to exit the board"""
@@ -82,6 +79,7 @@ class Board:
     def reset(self) -> None:
         """Resets the board to its initial state"""
         screen = self.screen.screen
+        self.running = True
 
         # BOARD
         self.board = [
@@ -130,6 +128,10 @@ class Board:
         self.winner = None
         self.winner_rect = None
 
+        # ANIMATIONS
+        self.turn_anim.reset()
+        self.confeti.reset()
+
     # HELPING METHODS
     def win(self) -> None:
         """Updates the winner"""
@@ -149,6 +151,7 @@ class Board:
     def change_turn(self) -> None:
         """Manages the logic of changing turn"""
         self.current = 'black' if self.current == 'white' else 'white'
+        self.turn_anim.reset()
 
     def kill(self, pos: tuple[int, int]) -> None:
         """Removes the piece from the board and plays its sound"""
@@ -186,6 +189,8 @@ class Board:
         self.turn_anim.update(self.dt)
         for piece in self.all_pieces:
             piece.update(self.dt)
+        
+        if self.winner: self.confeti.update(self.dt)
 
     def in_attack(self, pos: tuple[int, int]) -> bool:
         """Checks if the given position is in attack"""
@@ -229,8 +234,10 @@ class Board:
         # UPDATE TURN INDICATORS
         alpha = self.turn_anim.value
         if not self.winner:
-            top_color = RED*alpha if self.current=='black' else GREY
-            bottom_color = BLUE*alpha if self.current=='white' else GREY
+            if self.current == 'white': color = GREY + (BLUE - GREY) * alpha
+            else: color = GREY + (RED - GREY) * alpha
+            top_color = color if self.current=='black' else GREY
+            bottom_color = color if self.current=='white' else GREY
         else:
             top_color = bottom_color = RED if self.current=='white' else BLUE
 
@@ -247,6 +254,7 @@ class Board:
         if not self.winner: return
         self.screen.blit(self.winner_background, self.winner_rect)
         self.screen.blit(self.winner, self.winner_rect)
+        self.confeti.show()
 
     def click(self, event: pygame.event) -> None:
         """Manages all the logic when mouse is clicked"""
@@ -371,15 +379,21 @@ class Board:
             end =  self.screen.convert(start * 110 + topleft)
             pieces.append((piece, end))
 
+        self.dt = self.clock.tick(self.fps)
         while running:
             self.screen.fill('black')
             for event in pygame.event.get():
                 if event.type == pygame.QUIT: self.running = False
+                elif event.type == pygame.MOUSEMOTION: self.exit_button.hover(event)
+                elif event.type == pygame.MOUSEBUTTONDOWN:
+                    if self.exit_button.click(event): running = False
             
-            self.update()
+            self.left_stars.update(self.dt)
+            self.right_stars.update(self.dt)
             self.screen.blit(self.background, self.rect)
             self.left_stars.show()
             self.right_stars.show()
+            self.exit_button.show()
 
             if time > anim_time:
                 time = anim_time

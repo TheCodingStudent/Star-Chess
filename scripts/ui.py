@@ -1,3 +1,4 @@
+import os
 import pygame
 import random
 import threading
@@ -111,3 +112,77 @@ class Button:
         """Checks if the mouse is over the button"""
         if not self.rect.collidepoint(event.pos): self.hovered = False
         else: self.hovered = True
+
+
+class Monitor:
+    def __init__(self, screen: pygame.Surface, path: str, x: int, y: int):
+        path = os.path.dirname(path)
+        font_path = f'{path}/font/pixel.ttf'
+        font_size = 32
+        self.font = pygame.font.Font(font_path, font_size)
+        self.frames = None
+        self.screen = screen
+        self.topleft = (x, y)
+    
+    def update(self, dt: int) -> None:
+        if not dt: return
+        frames = 1000/dt
+        self.frames = self.font.render(f'FPS: {frames:.2f}', True, 'grey')
+        self.frames_rect = self.frames.get_rect(topleft=self.topleft)
+    
+    def show(self) -> None:
+        if not self.frames: return
+        self.screen.blit(self.frames, self.frames_rect)
+
+
+class Particle:
+    def __init__(self, screen: pygame.Surface):
+        self.screen = screen
+        self.reset()
+    
+    def reset(self) -> None:
+
+        # POSITION
+        width, height = self.screen.get_size()
+        x, y = 2*random.random()-1, 2*random.random()-1
+        centerx, centery = width/2, height/2
+        self.dir = pygame.Vector2(x, y)
+        self.dir.scale_to_length(random.randint(0, centerx))
+        # if self.dir.magnitude
+        self.pos = pygame.Vector2(centerx, centery)
+
+        # COLOR
+        colors = [
+            'red', 'green', 'blue',
+            'yellow', 'cyan', 'magenta',
+            'white', 'orange', 'pink'
+        ]
+        self.color = random.choice(colors)
+    
+    def update(self, dt: int) -> None:
+        self.pos += self.dir * dt * 0.001
+        self.rect = (self.pos.x, self.pos.y, 5, 5)
+    
+    def show(self) -> None:
+        pygame.draw.rect(self.screen, self.color, self.rect)
+
+
+class Confeti:
+    def __init__(self, screen: pygame.Surface):
+        self.screen = screen
+        self.particles = [
+            Particle(screen)
+            for _ in range(500)
+        ]
+    
+    def update(self, dt: int) -> None:
+        for particle in self.particles:
+            particle.update(dt)
+
+    def show(self )-> None:
+        for particle in self.particles:
+            particle.show()
+        
+    def reset(self) -> None:
+        for particle in self.particles:
+            particle.reset()

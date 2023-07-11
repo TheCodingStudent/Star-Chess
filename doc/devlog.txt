@@ -271,3 +271,52 @@
     *   Ahora ya esta el menu de agradecimientos
     *   Cambie el tamaño de la fuenta de la intro de 64 a 56
     *   Ahora si ya compilo y a dormir
+
+    11:25pm
+    *   De manera divertida el boton para reportar un bug tenia un error de
+        posicion ¿que raro no? en fin, ya esta arreglado
+
+11/07/23
+    11:59am
+    *   Resulta que puedo cambiar la resolucion del juego sin problema gracias
+        al sistema que habia implementado, asi que ahora puedo abrir 2 tableros
+        al mismo tiempo, lo usare para probar el online. Hoy se viene.
+
+    *   Empezare realizando el menu para introducir la ip del servidor y el
+        puerto, como siempre juego con Javier o Demian pues yo iniciaba el
+        servidor, pero ahora todos deben de ser capaces de hacerlo y
+        evidentemente no se conectaran todos a mi servidor de Hamachi.
+        Javier me habia comentado de HTTP, hare funcionar todo con el servidor
+        de Hamachi y una vez que funcione vere como quitarlo de la ecuacion,
+        de momento solo tengo que desarrollar el sistema de mensajes para
+        controlar el tablero.
+
+    12:16pm
+    *   Habia una caida de rendimiento si entrabas a una partida y salias varias
+        veces, esto era porque cada bucle se creaba un tablero y una intro,
+        lo cual no era necesario. Ya esta arreglado y va mas fluido.
+
+    1:17pm
+    *   Resultaba que cuando iniciabas la partida en ciertas circunstancias
+        la animacion de los personajes empezaba por la mitad, esto era debido
+        a que el reloj por algun motivo daba 3227ms y los demas en promedio de
+        16ms (60fps) entonces lo que hago es llamar al reloj justo antes de
+        empezar el bucle de animaciones. Tambien pensaba dejar los fps en lo
+        maximo que pudiera dar pero lo limite a 144fps para los que lleguen
+        a jugar en monitores fancy.
+
+    *   Tambien aplique el sistema DeltaValue para la animacion del titulo de
+        la intro, asi queda menos codigo y los calculos son mas exactos. 
+    
+    1:33pm
+    *   Al parecer no quiero hacer el online, asi que termine haciendo mejoras
+        esteticas a los tiempos de las animaciones, tambien a los indicadores
+        de turno, ahora con interpolacion lineal hago que pasen de gris al
+        color correspondiente, esto es placentero de ver.
+    *   Si tanto quiero hacer el diseño tal vez deberia hacer el confeti
+    *   Comere algo y luego continuo
+
+    2:54pm
+    *   Ahora al haber un ganador se genera confeti, esta fue idea de Javier
+    *   Cambie de nuevo la cantidad de estrellas
+    *   Me volvieron a sugerir añadir mas personas y configuraciones

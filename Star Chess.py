@@ -9,20 +9,23 @@ I HOPE YOU LIKE IT.
 
 # MODULES
 import pygame
+from audio import mixer
 from scripts import board
 from scripts import intro
-from audio import mixer
 
 # PYGAME WINDOW
 pygame.init()
 SCREEN = pygame.display.set_mode((0, 0), pygame.FULLSCREEN)
+# SCREEN = pygame.display.set_mode((960, 540))
 
 # MAIN LOOP
 if __name__ == '__main__':
-    while True:
-        MIXER = mixer.Mixer(__file__)
-        INTRO = intro.Intro(SCREEN, MIXER, __file__)
-        if not INTRO.main(): break
+    MIXER = mixer.Mixer(__file__)
+    INTRO = intro.Intro(SCREEN, MIXER, __file__)
+    BOARD = board.Board(SCREEN, MIXER, __file__)
 
-        BOARD = board.Board(SCREEN, MIXER, __file__)
+    while True:
+        INTRO.reset()
+        BOARD.reset()
+        if not INTRO.main(): break
         BOARD.intro()

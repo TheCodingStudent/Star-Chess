@@ -53,7 +53,7 @@ class Piece:
         # COLORS
         self.color = RED if team=='black' else BLUE
         self.hover_color = self.alpha_rect(YELLOW, 0.5)
-        self.move_color = self.alpha_rect(self.color, 0.15)
+        self.move_color = self.alpha_rect(self.color, 0.3)
         self.select_color = self.alpha_rect(self.color, 1)
 
         # RECT

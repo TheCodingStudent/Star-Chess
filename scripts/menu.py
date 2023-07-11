@@ -197,6 +197,82 @@ class GreetingsMenu(TextMenu):
         super().__init__(screen, intro, lines, 'Agradecimientos')
 
 
+class ServerMenu(Menu):
+    def __init__(self, screen: pygame.Surface, intro, name: str):
+        super().__init__(screen, intro, name)
+
+        # PROPERTIES
+        centerx = self.screen.get_width()/2
+        centery = self.screen.get_height()/2
+        height = self.screen.convert(64)
+
+        # VARIABLES
+        numbers = tuple(range(101))
+
+        # OPTIONS
+        self.options = [
+            Option(
+                screen=screen,
+                intro=intro,
+                string='VOLUMEN DE LA MUSICA',
+                center=(centerx, centery),
+                options=numbers,
+                config=self.intro.config,
+                function=self.intro.mixer.set_music_volume,
+                variable='music_volume'
+            ),
+            Option(
+                screen=screen,
+                intro=intro,
+                string='VOLUMEN DE LOS SONIDOS',
+                center=(centerx, centery+height),
+                options=numbers,
+                config=self.intro.config,
+                function=self.intro.mixer.set_sound_volume,
+                variable='sound_volume'
+            )
+        ]
+
+
+class Entry:
+    """Class to handle text input"""
+    def __init__(
+            self, screen: pygame.Surface, intro, string: str,
+            center: tuple[int, int]
+    ):
+        
+        # STYLE
+        self.screen = screen
+        self.string = string
+        self.font = intro.font
+        self.center = center
+
+    def render(self):
+        """Renders the entry text and its current text"""
+        self.option = self.options[self.index]
+        text = f'{self.string}: {self.option}'
+        self.text = self.font.render(text, True, 'yellow', 'black')
+        self.background = pygame.Surface(self.text.get_size())
+        self.text_rect = self.text.get_rect(center=self.center)
+    
+    def click(self, event: pygame.event) -> None:
+        """Checks if any button was clicked"""
+        if left := self.left_button.click(event): self.index = (self.index-1) % len(self.options)
+        if right := self.right_button.click(event): self.index = (self.index+1) % len(self.options)
+        if left or right:
+            self.config.update(self.variable, self.option)
+            self.function(self.option)
+            self.render()
+    
+    def hover(self, event: pygame.event) -> None:
+        """Checks if the mouse is hovering any button"""
+        self.left_button.hover(event)
+    
+    def show(self) -> None:
+        """Draws everything on screen"""
+        self.screen.blit(self.text, self.text_rect)
+
+
 class Option:
     """Class to handle an option"""
     def __init__(
@@ -222,8 +298,8 @@ class Option:
         self.render()
 
         # UI
-        self.left_button = Button(screen, intro.font, '-', self.text_rect.left-10, self.text_rect.top, lambda: None, position='topright')
-        self.right_button = Button(screen, intro.font, '+', self.text_rect.right+10, self.text_rect.top, lambda: None, position='topleft')
+        self.left_button = Button(screen, intro.font, '-', self.text_rect.left-20, self.text_rect.top, lambda: None, position='topright')
+        self.right_button = Button(screen, intro.font, '+', self.text_rect.right+20, self.text_rect.top, lambda: None, position='topleft')
     
     def click(self, event: pygame.event) -> None:
         """Checks if any button was clicked"""

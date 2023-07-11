@@ -39,17 +39,10 @@ class Intro:
 
         # CLOCK
         self.clock = pygame.time.Clock()
-        self.running = True
-        self.fps = 60
+        self.fps = 144
         self.dt = 0
 
-        # COORDINATION
-        self.show_buttons = False
-        self.no_continue = False
-
         # UI
-        self.status_message = ''
-        self.status_message_rect = None
         centerx = self.screen.width/2
         open_server = ui.Button(screen, self.font, 'Abrir partida', centerx, self.screen.convert(600), self.open_server)
         join_server = ui.Button(screen, self.font, 'Unirse a partida', centerx, self.screen.convert(664), self.join_server)
@@ -78,12 +71,31 @@ class Intro:
         self.config = functions.Config(path)
 
         # MENUS
-        self.show_options = False
-        self.show_instructions = False
-        self.show_greetings = False
         self.options_menu = OptionsMenu(self.screen, self)
         self.instructions_menu = InstructionsMenu(self.screen, self)
         self.greetings_menu = GreetingsMenu(self.screen, self)
+
+        # ANIMATIONS
+        self.title_anim = functions.DeltaValue(1000, height, self.top)
+
+        # OTHER CHANGES
+        # self.reset()
+
+    def reset(self) -> None:
+        """Resets the intro"""
+        self.running = True
+        self.show_options = False
+        self.show_instructions = False
+        self.show_greetings = False
+
+        # COORDINATION
+        self.running = True
+        self.show_buttons = False
+        self.no_continue = False
+
+        # UI
+        self.status_message = ''
+        self.status_message_rect = None
 
     def report_bug(self) -> None:
         """Opens the issues tab on browser"""
@@ -170,7 +182,9 @@ class Intro:
     
     def update(self) -> None:
         """Updates the animations"""
-        if self.logo_rect.top > self.top: self.logo_rect = self.logo_rect.move(0, -10)
+        if self.logo_rect.top != self.top:
+            self.title_anim.update(self.dt)
+            self.logo_rect.top = self.title_anim.value
         elif not self.show_buttons: self.show_buttons = True
         self.stars.update(self.dt)
     
