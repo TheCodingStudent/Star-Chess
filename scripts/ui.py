@@ -58,7 +58,7 @@ class StarCluster:
 
         # STARS
         properties = (screen, min_radius, max_radius, min_time, max_time, min_x, max_x, min_y, max_y)
-        self.stars = [Star(properties) for _ in range(num_stars)]
+        self.stars = [Star(*properties) for _ in range(num_stars)]
     
     def show(self) -> None:
         """Draws each star on screen"""

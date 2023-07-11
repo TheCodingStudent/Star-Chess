@@ -1,20 +1,24 @@
 import os
 import pygame
 import threading
+import webbrowser
 from web.server import Server
 from audio.mixer import Mixer
 from scripts import ui, functions
-from scripts.menu import OptionsMenu
 from scripts.resolution import ResolutionScreen
+from scripts.menu import OptionsMenu, InstructionsMenu, GreetingsMenu
 
 
 class Intro:
     """Manages the start menu"""
     def __init__(self, screen: pygame.Surface, mixer: Mixer, path: str):
 
+        # LINKS
+        self.issues = 'https://github.com/TheCodingStudent/Star-Chess/issues'
+
         # SCREEN CONFIGURATION
         self.screen = ResolutionScreen(screen, 1920, 1080)
-        height = self.screen.get_height()
+        width, height = self.screen.get_size()
 
         # MUSIC
         self.mixer = mixer
@@ -22,6 +26,7 @@ class Intro:
         # BACKGROUND
         self.top = self.screen.convert(100)
         self.bottom = self.screen.convert(height-100)
+        self.right = self.screen.convert(width-100)
         self.left = self.screen.convert(100)
 
         self.stars = ui.StarCluster(screen, 1000, max_radius=self.screen.convert(5))
@@ -30,7 +35,7 @@ class Intro:
         self.logo_rect = self.logo.get_rect(centerx=self.screen.width/2, top=height)
 
         # FONT
-        self.font = pygame.font.Font(f'{self.path}/font/pixel.ttf', int(self.screen.convert(64)))
+        self.font = pygame.font.Font(f'{self.path}/font/pixel.ttf', int(self.screen.convert(56)))
 
         # CLOCK
         self.clock = pygame.time.Clock()
@@ -48,13 +53,25 @@ class Intro:
         centerx = self.screen.width/2
         open_server = ui.Button(screen, self.font, 'Abrir partida', centerx, self.screen.convert(600), self.open_server)
         join_server = ui.Button(screen, self.font, 'Unirse a partida', centerx, self.screen.convert(664), self.join_server)
-        options = ui.Button(screen, self.font, 'Opciones', centerx, self.screen.convert(728), self.options)
-        exit_game = ui.Button(screen, self.font, 'Salir', centerx, self.screen.convert(792), self.leave)
+        instructions = ui.Button(screen, self.font, 'Instrucciones', centerx, self.screen.convert(728), self.instructions)
+        greetings = ui.Button(screen, self.font, 'Agradecimientos', centerx, self.screen.convert(792), self.greetings)
+        options = ui.Button(screen, self.font, 'Opciones', centerx, self.screen.convert(856), self.options)
+        exit_game = ui.Button(screen, self.font, 'Salir', centerx, self.screen.convert(920), self.leave)
+
+        report_bug = ui.Button(
+            screen, self.font, 'Reportar error', self.right, self.bottom,
+            self.report_bug, position='bottomright',
+            color='#ff0000', hover_color='#7f0000'
+        )
+
         self.buttons = [
             open_server,
             join_server,
+            instructions,
+            greetings,
             options,
-            exit_game
+            exit_game,
+            report_bug
         ]
 
         # CONFIGURATION
@@ -62,7 +79,15 @@ class Intro:
 
         # MENUS
         self.show_options = False
+        self.show_instructions = False
+        self.show_greetings = False
         self.options_menu = OptionsMenu(self.screen, self)
+        self.instructions_menu = InstructionsMenu(self.screen, self)
+        self.greetings_menu = GreetingsMenu(self.screen, self)
+
+    def report_bug(self) -> None:
+        """Opens the issues tab on browser"""
+        webbrowser.open(self.issues)
 
     def leave(self) -> None:
         """Exits all the game"""
@@ -84,6 +109,14 @@ class Intro:
         """Activates the flag to show options"""
         self.show_options = True
 
+    def instructions(self) -> None:
+        """Activates the flag to show instructions"""
+        self.show_instructions = True
+
+    def greetings(self) -> None:
+        """Activates the flag to show greetings"""
+        self.show_greetings = True
+
     def main(self) -> None:
         """Main loop for the intro"""
 
@@ -99,7 +132,7 @@ class Intro:
             if self.no_continue: return False
             self.screen.fill('black')
             for event in pygame.event.get():
-                if event.type == pygame.QUIT: self.get_out()
+                if event.type == pygame.QUIT: self.leave()
                 if event.type == pygame.USEREVENT: self.mixer.next()
                 elif event.type == pygame.MOUSEMOTION: self.hover(event)
                 elif event.type == pygame.MOUSEBUTTONDOWN: self.click(event)
@@ -107,6 +140,12 @@ class Intro:
             if self.show_options:
                 self.options_menu.main()
                 self.show_options = False
+            elif self.show_instructions:
+                self.instructions_menu.main()
+                self.show_instructions = False
+            elif self.show_greetings:
+                self.greetings_menu.main()
+                self.show_greetings = False
 
             self.update()
             self.show()

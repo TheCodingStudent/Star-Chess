@@ -254,3 +254,20 @@
     10:05pm
     *   Tomo media hora pero ya esta documentado todo, ya cada funcion que agregue
         espero documentarla en el momento.
+    
+    10:52pm
+    *   Llego el momento de inspiracion JAJAJA
+    *   Ahora el menu de inicio tiene instrucciones
+    *   Hay un boton para reportar un error en el repositorio
+    *   Arregle algunos detalles esteticos
+    *   Ahora los menus de inicio ya comparten las estrellas, de esta manera
+        se ve fluido y no tengo que crear miles de estrellas
+    *   Procedo a compilar el juego y subirlo
+    *   Ahora que hice una plantilla para los menus me dan ganas de añadir una
+        de agradecimientos. La gente lo merece
+    *   Ahora hay 2 menus, uno con opciones y otro con texto
+
+    11:06pm
+    *   Ahora ya esta el menu de agradecimientos
+    *   Cambie el tamaño de la fuenta de la intro de 64 a 56
+    *   Ahora si ya compilo y a dormir

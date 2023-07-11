@@ -2,46 +2,21 @@ import pygame
 from scripts.ui import Button
 
 
-class OptionsMenu:
-    """Menu for the game configuration options"""
-    def __init__(self, screen: pygame.Surface, intro):
+class Menu:
+    """Menu template"""
+    def __init__(self, screen: pygame.Surface, intro, name: str):
 
         # PROPERTIES
         self.screen = screen
         self.intro = intro
         self.running = True
         self.dt = 0
+        self.options = list()
 
-        centerx = self.screen.get_width()/2
-        centery = self.screen.get_height()/2
-        height = self.screen.convert(64)
-
-        # VARIABLES
-        numbers = tuple(range(101))
-
-        # OPTIONS
-        self.options = [
-            Option(
-                screen=screen,
-                intro=intro,
-                string='VOLUMEN DE LA MUSICA',
-                center=(centerx, centery),
-                options=numbers,
-                config=self.intro.config,
-                function=self.intro.mixer.set_music_volume,
-                variable='music_volume'
-            ),
-            Option(
-                screen=screen,
-                intro=intro,
-                string='VOLUMEN DE LOS SONIDOS',
-                center=(centerx, centery+height),
-                options=numbers,
-                config=self.intro.config,
-                function=self.intro.mixer.set_sound_volume,
-                variable='sound_volume'
-            )
-        ]
+        # NAME
+        top = self.screen.convert(50)
+        self.name = self.intro.font.render(name.upper(), True, 'yellow')
+        self.name_rect = self.name.get_rect(centerx=self.screen.get_width()/2, top=top)
 
         # UI
         self.exit_button = Button(
@@ -97,10 +72,129 @@ class OptionsMenu:
     
     def show(self) -> None:
         """Draws everything on screen"""
+        self.screen.blit(self.name, self.name_rect)
         self.exit_button.show()
         self.intro.stars.show()
         for option in self.options:
             option.show()
+
+
+class OptionsMenu(Menu):
+    """Menu for the game configuration options"""
+    def __init__(self, screen: pygame.Surface, intro):
+        super().__init__(screen, intro, 'Opciones')
+
+        # PROPERTIES
+        centerx = self.screen.get_width()/2
+        centery = self.screen.get_height()/2
+        height = self.screen.convert(64)
+
+        # VARIABLES
+        numbers = tuple(range(101))
+
+        # OPTIONS
+        self.options = [
+            Option(
+                screen=screen,
+                intro=intro,
+                string='VOLUMEN DE LA MUSICA',
+                center=(centerx, centery),
+                options=numbers,
+                config=self.intro.config,
+                function=self.intro.mixer.set_music_volume,
+                variable='music_volume'
+            ),
+            Option(
+                screen=screen,
+                intro=intro,
+                string='VOLUMEN DE LOS SONIDOS',
+                center=(centerx, centery+height),
+                options=numbers,
+                config=self.intro.config,
+                function=self.intro.mixer.set_sound_volume,
+                variable='sound_volume'
+            )
+        ]
+
+
+class TextMenu(Menu):
+    def __init__(self, screen: pygame.Surface, intro, lines: list[str], name: str):
+        super().__init__(screen, intro, name)
+
+        # PROPERTIES
+        centerx = self.screen.get_width()/2
+        centery = self.screen.get_height()/2
+
+        # TEXT
+        texts = [
+            self.intro.font.render(line.upper(), True, 'yellow')
+            for line in lines
+        ]
+
+        max_width = max([text.get_width() for text in texts]) 
+        max_height = sum([text.get_height() for text in texts])
+
+        self.text = pygame.Surface((max_width, max_height))
+        self.text.set_colorkey('black')
+
+        y = 0
+        for text in texts:
+            rect = text.get_rect(centerx=max_width/2, top=y)
+            self.text.blit(text, rect)
+            y += text.get_height()
+        
+        self.rect = self.text.get_rect(center=(centerx, centery))
+    
+    def show(self) -> None:
+        """Draws everything on screen"""
+        self.intro.stars.show()
+        self.exit_button.show()
+        self.screen.blit(self.text, self.rect)
+        self.screen.blit(self.name, self.name_rect)
+
+
+class InstructionsMenu(TextMenu):
+    """Menu for the game configuration options"""
+    def __init__(self, screen: pygame.Surface, intro):
+
+        # LINES
+        lines = [
+            "1. Los menus tienen botones de salida, en caso de algun error",
+            "utiliza Alt+F4 o Alt+Fn+F4.",
+            " ",
+            "2. Las piezas se mueven utilizando el mouse, da un click con el",
+            "boton izquierdo y apareceran los movimientos legales que",
+            "puedes realizar.",
+            " ",
+            "3. Si seleccionas un movimiento legal la pieza se movera a ese",
+            "lugar, en cambio si seleccionas el tablero se quitara la",
+            "seleccion de esa pieza.",
+            " ",
+            "4. Una vez haya algun ganador la forma de reiniciar el tablero",
+            "es presionando la tecla de espacio.",
+            " ",
+            " ",
+            "En caso de cualquier error por favor reportarlo haciendo uso",
+            "del boton de reportar error en el menu de inicio. Te llevara",
+            "a la pagina donde habra un boton verde para agregarlo"
+        ]
+
+        super().__init__(screen, intro, lines, 'Instrucciones')
+
+
+class GreetingsMenu(TextMenu):
+    def __init__(self, screen: pygame.Surface, intro):
+        lines = [
+            "Javier Vazquez",
+            "Por probar el juego conmigo y darme feedback e inspirarme",
+            "para seguir programando y mejorar como persona.",
+            " ",
+            "Demian Marin",
+            "Por hacer el diseño del tablero y darme feedback igualmente,",
+            "por las horas en llamada que pasamos mientras programo"
+        ]
+
+        super().__init__(screen, intro, lines, 'Agradecimientos')
 
 
 class Option:
