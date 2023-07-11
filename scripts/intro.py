@@ -25,8 +25,8 @@ class Intro:
 
         # BACKGROUND
         self.top = self.screen.convert(100)
-        self.bottom = self.screen.convert(height-100)
-        self.right = self.screen.convert(width-100)
+        self.bottom = height - self.screen.convert(100)
+        self.right = width - self.screen.convert(100)
         self.left = self.screen.convert(100)
 
         self.stars = ui.StarCluster(screen, 1000, max_radius=self.screen.convert(5))
