@@ -6,7 +6,7 @@ from web.server import Server
 from audio.mixer import Mixer
 from scripts import ui, functions
 from scripts.resolution import ResolutionScreen
-from scripts.menu import OptionsMenu, InstructionsMenu, GreetingsMenu
+from scripts.menu import OptionsMenu, InstructionsMenu, GreetingsMenu, ServerMenu
 
 
 class Intro:
@@ -25,12 +25,12 @@ class Intro:
 
         # BACKGROUND
         self.top = self.screen.convert(100)
-        self.bottom = height - self.screen.convert(100)
-        self.right = width - self.screen.convert(100)
         self.left = self.screen.convert(100)
+        self.right = width - self.screen.convert(100)
+        self.bottom = height - self.screen.convert(100)
 
-        self.stars = ui.StarCluster(screen, 1000, max_radius=self.screen.convert(5))
         self.path = os.path.dirname(path)
+        self.stars = ui.StarCluster(screen, 1000, max_radius=self.screen.convert(5))
         self.logo = self.screen.load_image(f'{self.path}/images/logo.png', color_key='black', scale=17.5)
         self.logo_rect = self.logo.get_rect(centerx=self.screen.width/2, top=height)
 
@@ -38,13 +38,13 @@ class Intro:
         self.font = pygame.font.Font(f'{self.path}/font/pixel.ttf', int(self.screen.convert(56)))
 
         # CLOCK
-        self.clock = pygame.time.Clock()
-        self.fps = 144
         self.dt = 0
+        self.fps = 144
+        self.clock = pygame.time.Clock()
 
         # UI
         centerx = self.screen.width/2
-        open_server = ui.Button(screen, self.font, 'Abrir partida', centerx, self.screen.convert(600), self.open_server)
+        open_server = ui.Button(screen, self.font, 'Abrir partida', centerx, self.screen.convert(600), self.server)
         join_server = ui.Button(screen, self.font, 'Unirse a partida', centerx, self.screen.convert(664), self.join_server)
         instructions = ui.Button(screen, self.font, 'Instrucciones', centerx, self.screen.convert(728), self.instructions)
         greetings = ui.Button(screen, self.font, 'Agradecimientos', centerx, self.screen.convert(792), self.greetings)
@@ -71,15 +71,17 @@ class Intro:
         self.config = functions.Config(path)
 
         # MENUS
+        self.server_menu = ServerMenu(self.screen, self)
         self.options_menu = OptionsMenu(self.screen, self)
-        self.instructions_menu = InstructionsMenu(self.screen, self)
         self.greetings_menu = GreetingsMenu(self.screen, self)
+        self.instructions_menu = InstructionsMenu(self.screen, self)
 
         # ANIMATIONS
         self.title_anim = functions.DeltaValue(1000, height, self.top)
 
-        # OTHER CHANGES
-        # self.reset()
+        # WEB
+        self.ip = ''
+        self.port = ''
 
     def reset(self) -> None:
         """Resets the intro"""
@@ -87,6 +89,7 @@ class Intro:
         self.show_options = False
         self.show_instructions = False
         self.show_greetings = False
+        self.show_open_server = False
 
         # COORDINATION
         self.running = True
@@ -105,17 +108,23 @@ class Intro:
         """Exits all the game"""
         self.no_continue = True
     
+    def update_status(self, status: str) -> None:
+        """Updates the status message"""
+        self.status_message = self.font.render(status.upper(), True, 'white')
+        self.status_message_rect = self.status_message.get_rect(left=self.left, bottom=self.bottom)
+
     def open_server(self) -> None:
         """Opens the socket server"""
-        server = Server()
+        server = Server(self.ip, self.port)
         thread = threading.Thread(target=server.receive, daemon=True)
         thread.start()
-        self.status_message = self.font.render('Servidor listo...'.upper(), True, 'white')
-        self.status_message_rect = self.status_message.get_rect(left=self.left, bottom=self.bottom)
     
     def join_server(self) -> None:
         """Joins to a socket server"""
         self.running = False
+
+    def server(self) -> None:
+        self.show_open_server = True
 
     def options(self) -> None:
         """Activates the flag to show options"""
@@ -152,12 +161,25 @@ class Intro:
             if self.show_options:
                 self.options_menu.main()
                 self.show_options = False
+                
             elif self.show_instructions:
                 self.instructions_menu.main()
                 self.show_instructions = False
+
             elif self.show_greetings:
                 self.greetings_menu.main()
                 self.show_greetings = False
+
+            elif self.show_open_server:
+                try:
+                    self.ip, self.port = self.server_menu.main()
+                    self.open_server()
+                    self.update_status('Servidor abierto')
+                except ValueError:
+                    self.update_status('Puerto invalido')
+                except  OSError:
+                    self.update_status('IP invalida')
+                self.show_open_server = False
 
             self.update()
             self.show()

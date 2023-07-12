@@ -59,9 +59,9 @@ class Pawn(Piece):
             self.possible_moves.append(self.right_passant_end)
             self.can_right_passant = True
     
-    def move(self, pos: tuple[int, int], change_turn: bool = True) -> None:
+    def move(self, pos: tuple[int, int]) -> None:
         """Pawn must update its passant when moved"""
-        super().move(pos, change_turn)
+        super().move(pos)
 
         # UPDATE PASSANT
         self.left_passant = (self.x-1, self.en_passant_row)

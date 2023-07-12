@@ -1,4 +1,3 @@
-import time
 import socket
 from threading import Thread
 
@@ -6,11 +5,11 @@ KB = 16
 
 class Server:
     """Server class"""
-    def __init__(self):
+    def __init__(self, ip: str='25.73.52.143', port: int=55555):
 
         # Properties
-        self.host = '25.73.52.143'
-        self.port = 55555
+        self.host = ip
+        self.port = port
         self.clients = list()
         self.threads = list()
 
@@ -21,19 +20,21 @@ class Server:
 
     def broadcast(self, message: bytes) -> None:
         """Sends a message to all clients"""
-        print('broadcasting ', message)
+        print('broadcasting: ', message)
         if not isinstance(message, bytes): message = message.encode()
         for client in self.clients:
             client.send(message)
 
     def handle(self, client: socket.socket) -> None:
         """Handles the connection with each client"""
+        print(f'handling client')
         while self.listening:
             try:
                 message = client.recv(1024*KB).decode()
                 if message:
                     print(f'server: {message}')
                     self.broadcast(message)
+                # else: print('no message to broadcast')
             except Exception as e:
                 print(e)
                 self.clients.remove(client)
@@ -62,6 +63,8 @@ class Server:
                 if not response: 
                     print('cliente no conectado')
                     continue
+                else:
+                    print(f'{len(self.clients)=}')
             
                 self.clients.append(client)
                 print(f'cliente conectado con exito: {len(self.clients)}')
@@ -72,7 +75,6 @@ class Server:
         except KeyboardInterrupt:
             self.listening = False
         
-
 
 if __name__ == '__main__':
     server = Server()

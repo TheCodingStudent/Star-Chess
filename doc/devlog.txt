@@ -344,3 +344,19 @@
     
     5:23pm
     *   DEJA YA DE POSTERGAR EL ONLINE
+
+    7:20pm
+    *   La configuracion ahora utiliza la funcion para obtener archivos de
+        las variables de entorno
+    *   Ahora ya funciona la conexion socket entre servidor y cliente
+    *   Ahora el tablero hereda de la clase Client
+    *   La direccion IP y el puerto ahora se guardan en la configuracion
+    *   Las 2 anteriores tambien se cargan automaticamente al menu
+    *   La prueba de conexion fue exitosa
+
+    10:02pm
+    *   Dios santo, ya parece que el sistema funciona
+    *   Hubo un gran problema con la comunicacion, tuve que crear algun delay
+        en las funciones de mandar mensajes porque resultaban pegados y esto
+        no permitia parsear bien los comandos
+    *   Tantas horas y parece que no le hago nada al juego por dios

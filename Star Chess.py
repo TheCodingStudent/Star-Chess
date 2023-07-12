@@ -15,8 +15,8 @@ from scripts import intro
 
 # PYGAME WINDOW
 pygame.init()
-SCREEN = pygame.display.set_mode((0, 0), pygame.FULLSCREEN)
-# SCREEN = pygame.display.set_mode((960, 540))
+# SCREEN = pygame.display.set_mode((0, 0), pygame.FULLSCREEN)
+SCREEN = pygame.display.set_mode((960, 540))
 
 # MAIN LOOP
 if __name__ == '__main__':
@@ -28,4 +28,5 @@ if __name__ == '__main__':
         INTRO.reset()
         BOARD.reset()
         if not INTRO.main(): break
+        BOARD.connect(BOARD.ip, BOARD.port)
         BOARD.intro()

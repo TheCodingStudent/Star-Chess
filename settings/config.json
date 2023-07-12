@@ -1,4 +1,6 @@
 {
     "music_volume": 19,
-    "sound_volume": 100
+    "sound_volume": 100,
+    "ip": "25.73.52.143",
+    "port": "55555"
 }

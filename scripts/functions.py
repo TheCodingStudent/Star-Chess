@@ -56,6 +56,7 @@ class Config:
 
         # PROPERTIES
         self.path = f'{os.path.dirname(path)}/settings/config.json'
+        self.path = resource_path(self.path)
         self.config = self.load()
 
     def get(self, key: str, default: object=None) -> object:

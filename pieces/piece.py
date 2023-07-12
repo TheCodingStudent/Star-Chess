@@ -100,9 +100,10 @@ class Piece:
         """Gets the rect to position the piece"""
         return self.screen.get_rect(self.image, ((x*SQUARE+LEFT), (y*SQUARE+TOP)))
 
-    def move(self, pos: tuple[int, int], change_turn: bool=True) -> None:
+    def move(self, pos: tuple[int, int]) -> None:
         """Moves the piece and updates itself and the board"""
-        self.board.move((self.x, self.y), pos, change_turn)
+        # self.board.move((self.x, self.y), pos, change_turn)
+        print(f'moving piece to {pos=}')
         self.x, self.y = pos
         self.get_name_rect()
         self.rect = self.get_rect(self.x, self.y)
@@ -170,3 +171,5 @@ class Piece:
         """Checks if the given position is attack by the enemy"""
         return self.board.in_attack(pos)
 
+    def __repr__(self) -> None:
+        return f'({self.x}, {self.y}), {self.team}'

@@ -1,5 +1,7 @@
 import os
+import time
 import pygame
+from web import client
 from audio.mixer import Mixer
 from scripts import ui, functions
 from scripts.resolution import ResolutionScreen
@@ -29,8 +31,10 @@ GREY = pygame.Vector3(65, 63, 65)
 BLUE = pygame.Vector3(16, 115, 230)
 
 
-class Board:
+class Board(client.Client):
     def __init__(self, screen: pygame.Surface, mixer: Mixer, path: str):
+
+        super().__init__()
 
         # SCREEN CONFIGURATION
         self.path = path
@@ -152,30 +156,41 @@ class Board:
 
     def change_turn(self) -> None:
         """Manages the logic of changing turn"""
+        print(f'changing turn')
         self.current = 'black' if self.current == 'white' else 'white'
         self.turn_anim.reset()
 
-    def kill(self, pos: tuple[int, int]) -> None:
+    def kill(self, x: int, y: int) -> None:
         """Removes the piece from the board and plays its sound"""
-        if not (piece := self.get(pos)): return
-        if self.current == 'white': self.black_pieces.remove(piece)
-        if self.current == 'black': self.white_pieces.remove(piece)
+        print(f'killing {x}, {y}')
+        if not (piece := self.get((x, y))): return
+        print(f'piece to kill {piece=} {piece in self.all_pieces}')
+        if piece in self.black_pieces: self.black_pieces.remove(piece)
+        if piece in self.white_pieces: self.white_pieces.remove(piece)
         self.all_pieces.remove(piece)
-        self.board[pos[1]][pos[0]] = None
+        print('piece removed')
+        self.board[y][x] = None
+        print(f'{self.board[y][x]=}')
         self.mixer.play_sound('capture.wav')
 
         # CHECK IF MATE
-        if isinstance(piece, King): self.win()
+        if isinstance(piece, King):
+            # self.win()
+            self.send_message(f'win:[]')
 
-    def move(self, start: tuple[int, int], end: tuple[int, int], change_turn: bool=True) -> None:
+    def move(self, x0: int, y0: int, x1: int, y1: int) -> None:
         """Manages the logic of moving a piece"""
-        (x0, y0), (x1, y1) = start, end
-        self.kill(end)
-
+        # (x0, y0), (x1, y1) = start, end
+        print(f'{type(x1)=} {type(y1)=}')
+        # self.send_message(f'kill:({x1},{y1})')
+        # self.kill(end)
+        # time.sleep(0.1)
+        selected_piece = self.board[y0][x0]
+        print(f'{selected_piece=}')
+        selected_piece.move((x1, y1))
+        print(f'{selected_piece=}')
         # SWAP THE PIECE AND CHANGE TURN IF NEEDED
         self.board[y0][x0], self.board[y1][x1] = self.board[y1][x1], self.board[y0][x0]
-        if not change_turn: return
-        self.change_turn()
     
     def hover(self, event: pygame.event) -> None:
         """Manages the logic for hovering the board or piece"""
@@ -214,6 +229,7 @@ class Board:
     def get(self, pos: tuple[int, int]):
         """Returns the piece at the given position"""
         x, y = pos
+        print(f'getting: {pos=}')
         if not self.in_bounds(pos): return None
         return self.board[y][x]
 
@@ -258,6 +274,22 @@ class Board:
         self.screen.blit(self.winner, self.winner_rect)
         self.confeti.show()
 
+    def on_receive(self, message: str) -> None:
+        if message == 'connected': return
+        print(f'parsing: {message=} {message.split(":")}')
+        function, args = message.split(':')
+        function = getattr(self, function)
+        print(f'{function=}')
+        if args:
+            args = eval(args)
+            print(f'{args=}')
+            function(*args)
+        else: function()
+    
+    def update_next_turn(self, x: int, y: int, attribute: str, value: object) -> None:
+        piece = self.board[y][x]
+        piece.update_next_turn(attribute, value)
+
     def click(self, event: pygame.event) -> None:
         """Manages all the logic when mouse is clicked"""
 
@@ -282,17 +314,37 @@ class Board:
 
                 # LEFT CASTLING
                 if self.selected.can_left_castling and self.selected.left_castling_rect.collidepoint(event.pos):
-                    self.selected.move(self.selected.left_castling)
-                    left_rook = self.get(self.selected.left_rook)
-                    left_rook.move(self.selected.left_rook_end, change_turn=False)
+                    x, y = self.selected.left_castling
+
+                    self.send_message(f'kill:({x},{y})')
+                    self.send_message(f'move:({self.selected.x},{self.selected.y},{x},{y})')
+                    # self.selected.move(self.selected.left_castling)
+                    # left_rook = self.get(self.selected.left_rook)
+                    # left_rook.move(self.selected.left_rook_end, change_turn=False)
+                    x0, y0 = self.selected.left_rook
+                    x1, y1 = self.selected.left_rook_end
+                    self.send_message(f'move:({x0},{y0},{x1},{y1})')
+                    self.send_message(f'change_turn:[]', 0.1)
                     self.selected = None
                     return self.mixer.play_sound('castle.wav')
 
                 # RIGHT CASTLING
                 elif self.selected.can_right_castling and self.selected.right_castling_rect.collidepoint(event.pos):
-                    self.selected.move(self.selected.right_castling)
-                    right_rook = self.get(self.selected.right_rook)
-                    right_rook.move(self.selected.right_rook_end, change_turn=False)
+                    # self.selected.move(self.selected.right_castling)
+                    # right_rook = self.get(self.selected.right_rook)
+                    # right_rook.move(self.selected.right_rook_end, change_turn=False)
+
+                    x, y = self.selected.right_castling
+                    # self.send_message(f'kill:({x},{y})')
+                    self.send_message(f'move:({self.selected.x},{self.selected.y},{x},{y})')
+                    # self.selected.move(self.selected.left_castling)
+                    # left_rook = self.get(self.selected.left_rook)
+                    # left_rook.move(self.selected.left_rook_end, change_turn=False)
+                    x0, y0 = self.selected.right_rook
+                    x1, y1 = self.selected.right_rook_end
+                    self.send_message(f'move:({x0},{y0},{x1},{y1})')
+                    # self.send_message(f'change_turn:[]')
+                    self.send_message(f'change_turn:[]', 0.1)
                     self.selected = None
                     return self.mixer.play_sound('castle.wav')
             
@@ -301,29 +353,54 @@ class Board:
                 # MOVED TWICE
                 if self.selected.double_move_rect.collidepoint(event.pos) and not self.selected.moved:
                     self.selected.moved_twice = True
-                    self.selected.update_next_turn('moved_twice', False)
-                    self.selected.move(self.selected.double_move)
+                    # self.selected.update_next_turn('moved_twice', False)
+                    x, y = self.selected.x, self.selected.y
+                    # self.send_message('testing double move')
+                    self.send_message(f'update_next_turn:({x},{y},"moved_twice",False)')
+                    # self.selected.move(self.selected.double_move)
+                    x0, y0 = self.selected.x, self.selected.y
+                    x1, y1 = self.selected.double_move
+                    self.send_message(f'move:({x0},{y0},{x1},{y1})')
+                    # time.sleep(0.1)
+                    self.send_message(f'change_turn:[]', 0.1)
                     self.selected = None
                     return
 
                 # LEFT EN PASSANT
                 elif self.selected.can_left_passant and self.selected.left_passant_rect.collidepoint(event.pos):
-                    self.kill(self.selected.left_passant)
-                    self.selected.move(self.selected.left_passant_end)
+                    # self.kill(self.selected.left_passant)
+                    x, y = self.selected.left_passant
+                    self.send_message(f'kill:({x},{y})')
+                    # self.selected.move(self.selected.left_passant_end)
+                    x0, y0 = self.selected.x, self.selected.y
+                    x1, y1 = self.selected.left_passant_end
+                    self.send_message(f'move:({x0},{y0},{x1},{y1})')
+                    self.send_message(f'change_turn:[]', 0.1)
                     self.selected = None
                     return
 
                 # RIGHT EN PASSANT
                 elif self.selected.can_right_passant and self.selected.right_passant_rect.collidepoint(event.pos):
-                    self.kill(self.selected.right_passant)
-                    self.selected.move(self.selected.right_passant_end)
+                    # self.kill(self.selected.right_passant)
+                    x, y = self.selected.right_passant
+                    self.send_message(f'kill:({x},{y})')
+                    # self.selected.move(self.selected.right_passant_end)
+                    x0, y0 = self.selected.x, self.selected.y
+                    x1, y1 = self.selected.right_passant_end
+                    self.send_message(f'move:({x0},{y0},{x1},{y1})')
+                    self.send_message(f'change_turn:[]', 0.1)
                     self.selected = None
                     return
 
             # CHECKS EACH POSSIBLE MOVE AND IF IT WAS CLICKED
             for i, rect in enumerate(self.selected.possible_moves_rects):
                 if not rect.collidepoint(event.pos): continue
-                self.selected.move(self.selected.possible_moves[i])
+                # self.selected.move(self.selected.possible_moves[i])
+                x0, y0 = self.selected.x, self.selected.y
+                x1, y1 = self.selected.possible_moves[i]
+                self.send_message(f'kill:({x1},{y1})')
+                self.send_message(f'move:({x0},{y0},{x1},{y1})')
+                self.send_message(f'change_turn:[]', 0.1)
                 self.selected = None
                 return
             
@@ -351,6 +428,7 @@ class Board:
                 elif event.type == pygame.MOUSEBUTTONDOWN: self.exit_button.click(event)
                 elif event.type == pygame.KEYDOWN:
                     if event.key == pygame.K_n: self.mixer.next()
+                    if event.key == pygame.K_m: self.win()
 
                 # INTERACT UNLESS THERE IS A WINNER
                 if not self.winner:

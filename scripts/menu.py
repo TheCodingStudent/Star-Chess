@@ -47,8 +47,9 @@ class Menu:
 
             for event in pygame.event.get():
                 if event.type == pygame.QUIT: self.running = False
-                elif event.type == pygame.MOUSEBUTTONDOWN: self.click(event)
+                elif event.type == pygame.KEYDOWN: self.keydown(event)
                 elif event.type == pygame.MOUSEMOTION: self.hover(event)
+                elif event.type == pygame.MOUSEBUTTONDOWN: self.click(event)
             
             self.update(self.dt)
             self.show()
@@ -63,6 +64,9 @@ class Menu:
         self.exit_button.click(event)
         for option in self.options:
             option.click(event)
+    
+    def keydown(self, event: pygame.event) -> None:
+        """Checks if any key was pressed"""
     
     def hover(self, event: pygame.event) -> None:
         """Checks if the mouse is hovering any button"""
@@ -199,78 +203,107 @@ class GreetingsMenu(TextMenu):
 
 
 class ServerMenu(Menu):
-    def __init__(self, screen: pygame.Surface, intro, name: str):
-        super().__init__(screen, intro, name)
+    def __init__(self, screen: pygame.Surface, intro):
+        super().__init__(screen, intro, 'Crear servidor')
 
         # PROPERTIES
         centerx = self.screen.get_width()/2
         centery = self.screen.get_height()/2
         height = self.screen.convert(64)
 
-        # VARIABLES
-        numbers = tuple(range(101))
-
-        # OPTIONS
         self.options = [
-            Option(
+            Entry(
                 screen=screen,
                 intro=intro,
-                string='VOLUMEN DE LA MUSICA',
+                string='IP del servidor',
                 center=(centerx, centery),
-                options=numbers,
-                config=self.intro.config,
-                function=self.intro.mixer.set_music_volume,
-                variable='music_volume'
+                config=intro.config,
+                variable='ip'
             ),
-            Option(
+            Entry(
                 screen=screen,
                 intro=intro,
-                string='VOLUMEN DE LOS SONIDOS',
+                string='Puerto del servidor',
                 center=(centerx, centery+height),
-                options=numbers,
-                config=self.intro.config,
-                function=self.intro.mixer.set_sound_volume,
-                variable='sound_volume'
+                config=intro.config,
+                variable='port'
             )
         ]
+    
+    def keydown(self, event: pygame.event) -> None:
+        for option in self.options:
+            option.keydown(event)
+
+    def main(self) -> None:
+        super().main()
+        return self.options[0].input, int(self.options[1].input)
 
 
 class Entry:
     """Class to handle text input"""
     def __init__(
             self, screen: pygame.Surface, intro, string: str,
-            center: tuple[int, int]
+            center: tuple[int, int], config, variable: str
     ):
         
         # STYLE
         self.screen = screen
+        self.intro = intro
         self.string = string
         self.font = intro.font
         self.center = center
 
+        # PROPERTIES
+        self.variable = variable
+        self.selected = False
+        self.input = config.get(self.variable)
+
+        self.render()
+
     def render(self):
         """Renders the entry text and its current text"""
-        self.option = self.options[self.index]
-        text = f'{self.string}: {self.option}'
+        text = f'{self.string}: {self.input}'
         self.text = self.font.render(text, True, 'yellow', 'black')
+        self.text.set_colorkey('black')
         self.background = pygame.Surface(self.text.get_size())
+        self.background.set_alpha(0)
+        pygame.draw.rect(self.background, 'white', (0, 0, *self.text.get_size()), border_radius=5)
         self.text_rect = self.text.get_rect(center=self.center)
-    
+
+        self.intro.config.update(self.variable, self.input)
+
     def click(self, event: pygame.event) -> None:
         """Checks if any button was clicked"""
-        if left := self.left_button.click(event): self.index = (self.index-1) % len(self.options)
-        if right := self.right_button.click(event): self.index = (self.index+1) % len(self.options)
-        if left or right:
-            self.config.update(self.variable, self.option)
-            self.function(self.option)
+        self.selected = self.text_rect.collidepoint(event.pos)
+        if self.selected: self.background.set_alpha(31)
+        else: self.background.set_alpha(0)
+    
+    def keydown(self, event: pygame.event) -> None:
+        """Checks if any key was pressed"""
+        # ENTRY MUST BE SELECTED TO WRITE
+        if not self.selected: return
+
+        # BACKSPACE
+        if event.key == 8 and self.input:
+            self.input = self.input[:-1]
             self.render()
+
+        # CHECK FOR DIGITS
+        try:
+            if not (char := chr(event.key)) in '0123456789.': return
+            self.input += char
+            self.render()
+        except ValueError: return
     
     def hover(self, event: pygame.event) -> None:
         """Checks if the mouse is hovering any button"""
-        self.left_button.hover(event)
+        if self.selected: self.background.set_alpha(31)
+        elif self.text_rect.collidepoint(event.pos): self.background.set_alpha(15)
+        else: self.background.set_alpha(0)
     
     def show(self) -> None:
         """Draws everything on screen"""
+        self.screen.blit(self.background, self.text_rect)
         self.screen.blit(self.text, self.text_rect)
 
 
