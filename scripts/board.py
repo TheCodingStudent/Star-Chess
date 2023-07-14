@@ -457,7 +457,7 @@ class Board(client.Client):
 
         pieces = list()
         for piece in self.all_pieces:
-            start = pygame.Vector2(piece.x+0.5, piece.y+0.5)
+            start = pygame.Vector2(piece.x+0.5, piece.y+1)
             end =  self.screen.convert(start * 110 + topleft)
             pieces.append((piece, end))
 
@@ -484,7 +484,8 @@ class Board(client.Client):
             t = time/anim_time
             for (piece, end) in pieces:
                 x = end.x + (width-left)*(1-t)
-                piece.rect.center = (x, end.y)
+                piece.image_rect.centerx = x
+                piece.image_rect.bottom = end.y
                 piece.show()
 
             pygame.display.update()

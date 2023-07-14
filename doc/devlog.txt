@@ -360,3 +360,23 @@
         en las funciones de mandar mensajes porque resultaban pegados y esto
         no permitia parsear bien los comandos
     *   Tantas horas y parece que no le hago nada al juego por dios
+
+    11:00pm
+    *   Probe el juego en linea con Demian y parece que en algunas partidas
+        todo surge bien, pero derrepente se muere. Aun no se porque.
+        Probablemente sea por la conexion, se ha de juntar algun mensaje o es
+        algun bug que no considere durante las pruebas
+
+13/07/23
+    11:40pm
+    *   Rehice todas las imagenes utilizando la misma paleta, esto para que las
+        imagenes se vean mejores
+
+14/07/23
+    12:16am
+    *   Los diseños ya estan ajustados y añadi algunos detalles
+    *   Ahora el sistema de los personas ajusta el centro en el eje x de la
+        pieza, esto permite centrar incluso piezas que ocupen mas espacio.
+        Esto esta pensado para cuando se añadan animaciones y de esta manera no
+        tener un caos, la hitbox ademas se alinea con la parte inferior de los
+        cuadros con la finalidad de tener estable una animacion.

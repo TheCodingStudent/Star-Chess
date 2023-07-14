@@ -47,8 +47,8 @@ class Piece:
 
         # IMAGE
         self.path = os.path.dirname(path)
-        image_path = functions.resource_path(f'{self.path}/images/{image}.png')
-        self.image = self.screen.load_image(image_path)
+        image_path = functions.resource_path(f'{self.path}/images/redesign/{image}.png')
+        self.image = self.screen.load_image(image_path, color_key='white', scale=5)
 
         # COLORS
         self.color = RED if team=='black' else BLUE
@@ -57,6 +57,9 @@ class Piece:
         self.select_color = self.alpha_rect(self.color, 1)
 
         # RECT
+        centerx = ((x+0.5)*SQUARE+LEFT) * self.screen.ratio
+        bottom = ((y+1)*SQUARE+TOP) * self.screen.ratio
+        self.image_rect = self.image.get_rect(centerx=centerx, bottom=bottom)
         self.rect = self.get_rect(self.x, self.y)
 
         # ANIMATION
@@ -98,7 +101,8 @@ class Piece:
 
     def get_rect(self, x: int, y: int) -> pygame.Rect:
         """Gets the rect to position the piece"""
-        return self.screen.get_rect(self.image, ((x*SQUARE+LEFT), (y*SQUARE+TOP)))
+        # return self.screen.get_rect(self.image, )
+        return self.move_color.get_rect(topleft=((x*SQUARE+LEFT), (y*SQUARE+TOP)))
 
     def move(self, pos: tuple[int, int]) -> None:
         """Moves the piece and updates itself and the board"""
@@ -109,6 +113,10 @@ class Piece:
         self.rect = self.get_rect(self.x, self.y)
         self.selected = False
         if not self.moved: self.moved = True
+
+        centerx = ((self.x+0.5)*SQUARE+LEFT) * self.screen.ratio
+        bottom = ((self.y+1)*SQUARE+TOP) * self.screen.ratio
+        self.image_rect = self.image.get_rect(centerx=centerx, bottom=bottom)
 
         # PLAY MOVE SOUND
         self.board.mixer.play_sound('move.wav')
@@ -126,7 +134,7 @@ class Piece:
         """Draws the piece on screen"""
         if self.selected: self.screen.blit(self.select_color, self.rect)
         elif self.hovered: self.screen.blit(self.hover_color, self.rect)
-        self.screen.blit(self.image, self.rect)
+        self.screen.blit(self.image, self.image_rect)
         
     def show_name(self) -> None:
         """Draws the name on screen"""
@@ -143,7 +151,8 @@ class Piece:
 
     def alpha_rect(self, color: str|tuple[int, int, int], alpha: float) -> pygame.Surface:
         """Creates a surface with an alpha channel for transparency"""
-        surface = pygame.Surface(self.image.get_size(), pygame.SRCALPHA)
+        size = self.screen.convert(SQUARE)
+        surface = pygame.Surface((size, size), pygame.SRCALPHA)
         surface.set_alpha(int(255*alpha))
         surface.fill(color)
         return surface
