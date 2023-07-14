@@ -2,6 +2,7 @@ import os
 import pygame
 import threading
 import webbrowser
+from scripts import board
 from web.server import Server
 from audio.mixer import Mixer
 from scripts import ui, functions
@@ -15,6 +16,9 @@ class Intro:
 
         # LINKS
         self.issues = 'https://github.com/TheCodingStudent/Star-Chess/issues'
+
+        # BOARD
+        self.board = None
 
         # SCREEN CONFIGURATION
         self.screen = ResolutionScreen(screen, 1920, 1080)
@@ -46,10 +50,13 @@ class Intro:
         centerx = self.screen.width/2
         open_server = ui.Button(screen, self.font, 'Abrir partida', centerx, self.screen.convert(600), self.server)
         join_server = ui.Button(screen, self.font, 'Unirse a partida', centerx, self.screen.convert(664), self.join_server)
-        instructions = ui.Button(screen, self.font, 'Instrucciones', centerx, self.screen.convert(728), self.instructions)
-        greetings = ui.Button(screen, self.font, 'Agradecimientos', centerx, self.screen.convert(792), self.greetings)
-        options = ui.Button(screen, self.font, 'Opciones', centerx, self.screen.convert(856), self.options)
-        exit_game = ui.Button(screen, self.font, 'Salir', centerx, self.screen.convert(920), self.leave)
+
+        solo_play = ui.Button(screen, self.font, 'Partida offline', centerx, self.screen.convert(728), self.solo_play)
+
+        instructions = ui.Button(screen, self.font, 'Instrucciones', centerx, self.screen.convert(792), self.instructions)
+        greetings = ui.Button(screen, self.font, 'Agradecimientos', centerx, self.screen.convert(856), self.greetings)
+        options = ui.Button(screen, self.font, 'Opciones', centerx, self.screen.convert(920), self.options)
+        exit_game = ui.Button(screen, self.font, 'Salir', centerx, self.screen.convert(984), self.leave)
 
         report_bug = ui.Button(
             screen, self.font, 'Reportar error', self.right, self.bottom,
@@ -60,6 +67,7 @@ class Intro:
         self.buttons = [
             open_server,
             join_server,
+            solo_play,
             instructions,
             greetings,
             options,
@@ -122,6 +130,11 @@ class Intro:
     def join_server(self) -> None:
         """Joins to a socket server"""
         self.running = False
+        self.board = board.OnlineBoard
+    
+    def solo_play(self) -> None:
+        self.running = False
+        self.board = board.OfflineBoard
 
     def server(self) -> None:
         self.show_open_server = True

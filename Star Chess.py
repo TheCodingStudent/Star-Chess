@@ -10,7 +10,6 @@ I HOPE YOU LIKE IT.
 # MODULES
 import pygame
 from audio import mixer
-from scripts import board
 from scripts import intro
 
 # PYGAME WINDOW
@@ -22,11 +21,11 @@ SCREEN = pygame.display.set_mode((0, 0), pygame.FULLSCREEN)
 if __name__ == '__main__':
     MIXER = mixer.Mixer(__file__)
     INTRO = intro.Intro(SCREEN, MIXER, __file__)
-    BOARD = board.Board(SCREEN, MIXER, __file__)
 
     while True:
         INTRO.reset()
-        BOARD.reset()
         if not INTRO.main(): break
-        BOARD.connect(BOARD.ip, BOARD.port)
+        BOARD = INTRO.board(SCREEN, MIXER, __file__)
+        BOARD.reset()
+        BOARD.connect(INTRO.ip, INTRO.port)
         BOARD.intro()

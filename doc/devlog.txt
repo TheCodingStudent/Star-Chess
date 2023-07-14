@@ -380,3 +380,9 @@
         Esto esta pensado para cuando se añadan animaciones y de esta manera no
         tener un caos, la hitbox ademas se alinea con la parte inferior de los
         cuadros con la finalidad de tener estable una animacion.
+    
+    2:42pm
+    *   Estoy por irme a casa de Ivan, entonces por hoy no trabajare en el juego
+    *   Implemente la partida offline, era molesto crear un server y despues
+        unirte, asi que ya se diferencia
+    *   Añadi a Lando, Greedo, Commander, los hice de manera rapida

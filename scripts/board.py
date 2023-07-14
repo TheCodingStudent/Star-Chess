@@ -31,11 +31,8 @@ GREY = pygame.Vector3(65, 63, 65)
 BLUE = pygame.Vector3(16, 115, 230)
 
 
-class Board(client.Client):
+class Board:
     def __init__(self, screen: pygame.Surface, mixer: Mixer, path: str):
-
-        super().__init__()
-
         # SCREEN CONFIGURATION
         self.path = path
         self.screen = ResolutionScreen(screen, 1920, 1080)
@@ -75,6 +72,9 @@ class Board(client.Client):
             color='#ff0000',
             hover_color='#7f0000'
         )
+    
+    def connect(self, ip: str, port: int) -> None:
+        """Base function to connect, just for OnlineBoard"""
     
     def leave(self) -> None:
         """Marks the running flag to exit the board"""
@@ -175,8 +175,8 @@ class Board(client.Client):
 
         # CHECK IF MATE
         if isinstance(piece, King):
-            # self.win()
-            self.send_message(f'win:[]')
+            self.win()
+            # self.send_message(f'win:[]')
 
     def move(self, x0: int, y0: int, x1: int, y1: int) -> None:
         """Manages the logic of moving a piece"""
@@ -316,6 +316,259 @@ class Board(client.Client):
                 if self.selected.can_left_castling and self.selected.left_castling_rect.collidepoint(event.pos):
                     x, y = self.selected.left_castling
 
+                    # self.send_message(f'kill:({x},{y})')
+                    # self.send_message(f'move:({self.selected.x},{self.selected.y},{x},{y})')
+                    self.kill(x, y)
+                    self.move(self.selected.x, self.selected.y, x, y)
+                    # self.selected.move(self.selected.left_castling)
+                    # left_rook = self.get(self.selected.left_rook)
+                    # left_rook.move(self.selected.left_rook_end, change_turn=False)
+                    x0, y0 = self.selected.left_rook
+                    x1, y1 = self.selected.left_rook_end
+                    # self.send_message(f'move:({x0},{y0},{x1},{y1})')
+                    self.move(x0, y0, x1, y1)
+                    # self.send_message(f'change_turn:[]', 0.1)
+                    self.change_turn()
+                    self.selected = None
+                    return self.mixer.play_sound('castle.wav')
+
+                # RIGHT CASTLING
+                elif self.selected.can_right_castling and self.selected.right_castling_rect.collidepoint(event.pos):
+                    # self.selected.move(self.selected.right_castling)
+                    # right_rook = self.get(self.selected.right_rook)
+                    # right_rook.move(self.selected.right_rook_end, change_turn=False)
+
+                    x, y = self.selected.right_castling
+                    # self.send_message(f'kill:({x},{y})')
+                    # self.send_message(f'move:({self.selected.x},{self.selected.y},{x},{y})')
+                    self.move(self.selected.x, self.selected.y, x, y)
+                    # self.selected.move(self.selected.left_castling)
+                    # left_rook = self.get(self.selected.left_rook)
+                    # left_rook.move(self.selected.left_rook_end, change_turn=False)
+                    x0, y0 = self.selected.right_rook
+                    x1, y1 = self.selected.right_rook_end
+                    # self.send_message(f'move:({x0},{y0},{x1},{y1})')
+                    self.move(x0, y0, x1, y1)
+                    # self.send_message(f'change_turn:[]')
+                    # self.send_message(f'change_turn:[]', 0.1)
+                    self.change_turn()
+                    self.selected = None
+                    return self.mixer.play_sound('castle.wav')
+            
+            elif isinstance(self.selected, Pawn):
+
+                # MOVED TWICE
+                if self.selected.double_move_rect.collidepoint(event.pos) and not self.selected.moved:
+                    self.selected.moved_twice = True
+                    # self.selected.update_next_turn('moved_twice', False)
+                    x, y = self.selected.x, self.selected.y
+                    # self.send_message('testing double move')
+                    # self.send_message(f'update_next_turn:({x},{y},"moved_twice",False)')
+                    self.update_next_turn(x, y, "moved_twice", False)
+                    # self.selected.move(self.selected.double_move)
+                    x0, y0 = self.selected.x, self.selected.y
+                    x1, y1 = self.selected.double_move
+                    # self.send_message(f'move:({x0},{y0},{x1},{y1})')
+                    self.move(x0, y0, x1, y1)
+                    # time.sleep(0.1)
+                    # self.send_message(f'change_turn:[]', 0.1)
+                    self.change_turn()
+                    self.selected = None
+                    return
+
+                # LEFT EN PASSANT
+                elif self.selected.can_left_passant and self.selected.left_passant_rect.collidepoint(event.pos):
+                    # self.kill(self.selected.left_passant)
+                    x, y = self.selected.left_passant
+                    # self.send_message(f'kill:({x},{y})')
+                    self.kill(x, y)
+                    # self.selected.move(self.selected.left_passant_end)
+                    x0, y0 = self.selected.x, self.selected.y
+                    x1, y1 = self.selected.left_passant_end
+                    # self.send_message(f'move:({x0},{y0},{x1},{y1})')
+                    self.move(x0, y0, x1, y1)
+                    # self.send_message(f'change_turn:[]', 0.1)
+                    self.change_turn()
+                    self.selected = None
+                    return
+
+                # RIGHT EN PASSANT
+                elif self.selected.can_right_passant and self.selected.right_passant_rect.collidepoint(event.pos):
+                    # self.kill(self.selected.right_passant)
+                    x, y = self.selected.right_passant
+                    # self.send_message(f'kill:({x},{y})')
+                    self.kill(x, y)
+                    # self.selected.move(self.selected.right_passant_end)
+                    x0, y0 = self.selected.x, self.selected.y
+                    x1, y1 = self.selected.right_passant_end
+                    # self.send_message(f'move:({x0},{y0},{x1},{y1})')
+                    self.move(x0, y0, x1, y1)
+                    # self.send_message(f'change_turn:[]', 0.1)
+                    self.change_turn()
+                    self.selected = None
+                    return
+
+            # CHECKS EACH POSSIBLE MOVE AND IF IT WAS CLICKED
+            for i, rect in enumerate(self.selected.possible_moves_rects):
+                if not rect.collidepoint(event.pos): continue
+                # self.selected.move(self.selected.possible_moves[i])
+                x0, y0 = self.selected.x, self.selected.y
+                x1, y1 = self.selected.possible_moves[i]
+                # self.send_message(f'kill:({x1},{y1})')
+                self.kill(x1, y1)
+                # self.send_message(f'move:({x0},{y0},{x1},{y1})')
+                self.move(x0, y0, x1, y1)
+                # self.send_message(f'change_turn:[]', 0.1)
+                self.change_turn()
+                self.selected = None
+                return
+            
+            # IF NOT MOVE WAS SELECTED, THEN WE DESELECT THE PIECE
+            self.selected.selected = False
+            self.selected = None
+
+        # CHECKS CLICK ON PIECE
+        for piece in current_pieces:
+            if not piece.click(event): continue
+            self.selected = piece
+            self.selected.calculate_moves()
+            return self.selected.calculate_moves_rects()
+    
+    
+    def main(self) -> None:
+        """Main loop of the board"""
+
+        # MAIN LOOP
+        while self.running:
+            self.screen.fill('black')
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT: self.running = False
+                elif event.type == pygame.USEREVENT: self.mixer.next()
+                elif event.type == pygame.MOUSEMOTION: self.exit_button.hover(event)
+                elif event.type == pygame.MOUSEBUTTONDOWN: self.exit_button.click(event)
+                elif event.type == pygame.KEYDOWN:
+                    if event.key == pygame.K_n: self.mixer.next()
+                    if event.key == pygame.K_m: self.win()
+
+                # INTERACT UNLESS THERE IS A WINNER
+                if not self.winner:
+                    if event.type == pygame.MOUSEMOTION: self.hover(event)
+                    elif event.type == pygame.MOUSEBUTTONDOWN: self.click(event)
+
+                # ONLY DETECT SPACEBAR TO RESET BOARD 
+                elif (event.type == pygame.KEYDOWN) and (event.key == pygame.K_SPACE):
+                    self.reset()
+
+            self.update()
+            self.show()
+            pygame.display.update()
+            self.dt = self.clock.tick(self.fps)
+
+    def intro(self) -> None:
+        """Loop for the intro animation"""
+
+        # MAIN LOOP
+        time = 0
+        anim_time = 3000
+        width = self.screen.get_width()
+        left = self.screen.convert(520)
+        topleft = pygame.Vector2(520, 95)
+        running = True
+
+        pieces = list()
+        for piece in self.all_pieces:
+            start = pygame.Vector2(piece.x+0.5, piece.y+1)
+            end =  self.screen.convert(start * 110 + topleft)
+            pieces.append((piece, end))
+
+        self.dt = self.clock.tick(self.fps)
+        while running:
+            self.screen.fill('black')
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT: self.running = False
+                elif event.type == pygame.MOUSEMOTION: self.exit_button.hover(event)
+                elif event.type == pygame.MOUSEBUTTONDOWN:
+                    if self.exit_button.click(event): running = False
+            
+            self.left_stars.update(self.dt)
+            self.right_stars.update(self.dt)
+            self.screen.blit(self.background, self.rect)
+            self.left_stars.show()
+            self.right_stars.show()
+            self.exit_button.show()
+
+            if time > anim_time:
+                time = anim_time
+                running = False
+
+            t = time/anim_time
+            for (piece, end) in pieces:
+                x = end.x + (width-left)*(1-t)
+                piece.image_rect.centerx = x
+                piece.image_rect.bottom = end.y
+                piece.show()
+
+            pygame.display.update()
+            self.dt = self.clock.tick(self.fps)
+            time += self.dt
+        
+        self.main()
+
+
+class OfflineBoard(Board):
+    def __init__(self, screen: pygame.Surface, mixer: Mixer, path: str):
+        super().__init__(screen, mixer, path)
+
+
+class OnlineBoard(Board, client.Client):
+    def __init__(self, screen: pygame.Surface, mixer: Mixer, path: str):
+        Board.__init__(self, screen, mixer, path)
+        client.Client.__init__(self)
+    
+    def kill(self, x: int, y: int) -> None:
+        """Removes the piece from the board and plays its sound"""
+        print(f'killing {x}, {y}')
+        if not (piece := self.get((x, y))): return
+        print(f'piece to kill {piece=} {piece in self.all_pieces}')
+        if piece in self.black_pieces: self.black_pieces.remove(piece)
+        if piece in self.white_pieces: self.white_pieces.remove(piece)
+        self.all_pieces.remove(piece)
+        print('piece removed')
+        self.board[y][x] = None
+        print(f'{self.board[y][x]=}')
+        self.mixer.play_sound('capture.wav')
+
+        # CHECK IF MATE
+        if isinstance(piece, King):
+            # self.win()
+            self.send_message(f'win:[]')
+    
+    def click(self, event: pygame.event) -> None:
+        """Manages all the logic when mouse is clicked"""
+
+        # CHECK CLICK ON UI
+        if self.exit_button.click(event): return
+
+        # IF ANY WINNER THEN THE CLICK IS UNABLED
+        if self.winner: return
+
+        # GET ALL THE PIECES OF THE CURRENT PLAYER
+        current_pieces = getattr(self, f'{self.current}_pieces')
+
+        # APPLY ANY FLAG
+        for piece in current_pieces:
+            piece.check_flag()
+
+        # CHECKS CLICK ON MOVE
+        if self.selected:
+
+            # KING SPECIAL MOVES
+            if isinstance(self.selected, King):
+
+                # LEFT CASTLING
+                if self.selected.can_left_castling and self.selected.left_castling_rect.collidepoint(event.pos):
+                    x, y = self.selected.left_castling
+
                     self.send_message(f'kill:({x},{y})')
                     self.send_message(f'move:({self.selected.x},{self.selected.y},{x},{y})')
                     # self.selected.move(self.selected.left_castling)
@@ -414,82 +667,3 @@ class Board(client.Client):
             self.selected = piece
             self.selected.calculate_moves()
             return self.selected.calculate_moves_rects()
-    
-    def main(self) -> None:
-        """Main loop of the board"""
-
-        # MAIN LOOP
-        while self.running:
-            self.screen.fill('black')
-            for event in pygame.event.get():
-                if event.type == pygame.QUIT: self.running = False
-                elif event.type == pygame.USEREVENT: self.mixer.next()
-                elif event.type == pygame.MOUSEMOTION: self.exit_button.hover(event)
-                elif event.type == pygame.MOUSEBUTTONDOWN: self.exit_button.click(event)
-                elif event.type == pygame.KEYDOWN:
-                    if event.key == pygame.K_n: self.mixer.next()
-                    if event.key == pygame.K_m: self.win()
-
-                # INTERACT UNLESS THERE IS A WINNER
-                if not self.winner:
-                    if event.type == pygame.MOUSEMOTION: self.hover(event)
-                    elif event.type == pygame.MOUSEBUTTONDOWN: self.click(event)
-
-                # ONLY DETECT SPACEBAR TO RESET BOARD 
-                elif (event.type == pygame.KEYDOWN) and (event.key == pygame.K_SPACE):
-                    self.reset()
-
-            self.update()
-            self.show()
-            pygame.display.update()
-            self.dt = self.clock.tick(self.fps)
-
-    def intro(self) -> None:
-        """Loop for the intro animation"""
-
-        # MAIN LOOP
-        time = 0
-        anim_time = 3000
-        width = self.screen.get_width()
-        left = self.screen.convert(520)
-        topleft = pygame.Vector2(520, 95)
-        running = True
-
-        pieces = list()
-        for piece in self.all_pieces:
-            start = pygame.Vector2(piece.x+0.5, piece.y+1)
-            end =  self.screen.convert(start * 110 + topleft)
-            pieces.append((piece, end))
-
-        self.dt = self.clock.tick(self.fps)
-        while running:
-            self.screen.fill('black')
-            for event in pygame.event.get():
-                if event.type == pygame.QUIT: self.running = False
-                elif event.type == pygame.MOUSEMOTION: self.exit_button.hover(event)
-                elif event.type == pygame.MOUSEBUTTONDOWN:
-                    if self.exit_button.click(event): running = False
-            
-            self.left_stars.update(self.dt)
-            self.right_stars.update(self.dt)
-            self.screen.blit(self.background, self.rect)
-            self.left_stars.show()
-            self.right_stars.show()
-            self.exit_button.show()
-
-            if time > anim_time:
-                time = anim_time
-                running = False
-
-            t = time/anim_time
-            for (piece, end) in pieces:
-                x = end.x + (width-left)*(1-t)
-                piece.image_rect.centerx = x
-                piece.image_rect.bottom = end.y
-                piece.show()
-
-            pygame.display.update()
-            self.dt = self.clock.tick(self.fps)
-            time += self.dt
-        
-        self.main()
