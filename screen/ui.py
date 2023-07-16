@@ -47,7 +47,7 @@ class StarCluster:
     """Collection of stars to simulate space"""
     def __init__(
         self, screen: pygame.Surface, num_stars: int,
-        min_radius: int=0, max_radius: int=5,
+        min_radius: int=0, max_radius: int=3,
         min_time: int=1, max_time: int=2,
         min_x: int=0, max_x: int=0,
         min_y: int=0, max_y: int=0

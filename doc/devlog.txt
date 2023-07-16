@@ -397,4 +397,20 @@
         variables por todos los archivos.
         Tambien hace mas sencillo al momento de añadir diferentes tamaños de
         tablero o quizas en un futuro otros tipos de tablero
-    *   Añadi a Lia a los agradecimientos 
+    *   Añadi a Lia a los agradecimientos
+
+    1:00am
+    *   Acabo de compilar la version 1.0.7
+    *   Agregue la carpeta screen al compiler
+    *   El ejecutable parece funcionar correctamente
+
+    1:11am
+    *   La escala estaba jodida de nuevo
+    *   La animacion de la intro se quedaba en bucle debido a que nunca llegaba
+        a la posicion debida (error de decimales)
+    *   La escala de los personajes es 4.5
+    *   Las estrellas no se dibujan en el tablero
+    *   Las colisiones de las piezas tambien ya estan arregladas
+        (error de escala)
+    *   Ya despues subo al repositorio
+    *   Bueno, sera de una vez

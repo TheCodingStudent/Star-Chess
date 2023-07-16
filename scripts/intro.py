@@ -1,4 +1,5 @@
 import os
+import math
 import pygame
 import threading
 import webbrowser
@@ -29,7 +30,7 @@ class Intro:
         self.mixer = mixer
 
         # BACKGROUND
-        self.top = self.screen.convert(100)
+        self.top = math.ceil(self.screen.convert(100))
         self.left = self.screen.convert(100)
         self.right = width - self.screen.convert(100)
         self.bottom = height - self.screen.convert(100)
@@ -218,7 +219,7 @@ class Intro:
     
     def update(self) -> None:
         """Updates the animations"""
-        if self.logo_rect.top != self.top:
+        if self.logo_rect.top > self.top:
             self.title_anim.update(self.dt)
             self.logo_rect.top = self.title_anim.value
         elif not self.show_buttons: self.show_buttons = True

@@ -38,7 +38,7 @@ class Piece:
         # IMAGE
         self.path = os.path.dirname(path)
         image_path = functions.resource_path(f'{self.path}/images/redesign/{image}.png')
-        self.image = self.screen.load_image(image_path, color_key='white', scale=4.75)
+        self.image = self.screen.load_image(image_path, color_key='white', scale=4.5)
 
         # COLORS
         self.color = RED if team=='black' else BLUE
@@ -92,7 +92,9 @@ class Piece:
     def get_rect(self, x: int, y: int) -> pygame.Rect:
         """Gets the rect to position the piece"""
         # return self.screen.get_rect(self.image, )
-        return self.move_color.get_rect(topleft=((x*SQUARE+LEFT), (y*SQUARE+TOP)))
+        left = self.screen.convert(x*SQUARE+LEFT)
+        top = self.screen.convert(y*SQUARE+TOP)
+        return self.move_color.get_rect(topleft=(left, top))
 
     def move(self, pos: tuple[int, int]) -> None:
         """Moves the piece and updates itself and the board"""

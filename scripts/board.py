@@ -25,8 +25,8 @@ class Board:
         self.mixer = mixer
 
         # BACKGROUND
-        self.left_stars = ui.StarCluster(screen, 100, max_x=self.screen.convert(BOARD_LEFT))
-        self.right_stars = ui.StarCluster(screen, 100, min_x=self.screen.convert(BOARD_RIGHT), max_y=self.screen.convert(PLANET_TOP))
+        self.left_stars = ui.StarCluster(screen, 100, max_x=self.screen.convert(BOARD_LEFT-10))
+        self.right_stars = ui.StarCluster(screen, 100, min_x=self.screen.convert(BOARD_RIGHT+10), max_y=self.screen.convert(PLANET_TOP))
 
         self.background = self.screen.load_image(f'{os.path.dirname(path)}/images/{BOARD_IMAGE}')
         self.rect = self.screen.get_rect(self.background, self.screen.center, 'center')
