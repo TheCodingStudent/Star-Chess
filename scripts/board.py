@@ -1,10 +1,11 @@
 import os
-import time
 import pygame
+from screen import ui
 from web import client
+from scripts import functions
 from audio.mixer import Mixer
-from scripts import ui, functions
-from scripts.resolution import ResolutionScreen
+from settings.settings import *
+from screen.resolution import ResolutionScreen
 
 from pieces.pawn import Pawn
 from pieces.rook import Rook
@@ -12,23 +13,6 @@ from pieces.king import King
 from pieces.queen import Queen
 from pieces.knight import Knight
 from pieces.bishop import Bishop
-
-# BOARD MEASURES
-SQUARE = 110
-TOP = 95
-LEFT = 469
-RIGHT = 1450
-
-# CORNERS
-TOPLEFT = (495, 70)
-TOPRIGHT = (1424, 70)
-BOTTOMLEFT = (495, 999)
-BOTTOMRIGHT = (1424, 999)
-
-# COLORS
-RED = pygame.Vector3(217, 0, 8)
-GREY = pygame.Vector3(65, 63, 65)
-BLUE = pygame.Vector3(16, 115, 230)
 
 
 class Board:
@@ -41,10 +25,10 @@ class Board:
         self.mixer = mixer
 
         # BACKGROUND
-        self.left_stars = ui.StarCluster(screen, 100, max_x=self.screen.convert(LEFT), max_y=self.screen.convert(1080))
-        self.right_stars = ui.StarCluster(screen, 100, min_x=self.screen.convert(RIGHT), max_y=self.screen.convert(700))
+        self.left_stars = ui.StarCluster(screen, 100, max_x=self.screen.convert(BOARD_LEFT))
+        self.right_stars = ui.StarCluster(screen, 100, min_x=self.screen.convert(BOARD_RIGHT), max_y=self.screen.convert(PLANET_TOP))
 
-        self.background = self.screen.load_image(f'{os.path.dirname(path)}/images/background.png')
+        self.background = self.screen.load_image(f'{os.path.dirname(path)}/images/{BOARD_IMAGE}')
         self.rect = self.screen.get_rect(self.background, self.screen.center, 'center')
 
         # FONT
@@ -471,14 +455,14 @@ class Board:
         time = 0
         anim_time = 3000
         width = self.screen.get_width()
-        left = self.screen.convert(520)
-        topleft = pygame.Vector2(520, 95)
+        left = self.screen.convert(LEFT)
+        topleft = pygame.Vector2(LEFT, TOP)
         running = True
 
         pieces = list()
         for piece in self.all_pieces:
             start = pygame.Vector2(piece.x+0.5, piece.y+1)
-            end =  self.screen.convert(start * 110 + topleft)
+            end =  self.screen.convert(start * SQUARE + topleft)
             pieces.append((piece, end))
 
         self.dt = self.clock.tick(self.fps)

@@ -1,18 +1,8 @@
 import os
 import pygame
 from scripts import functions
-from scripts.resolution import ResolutionScreen
-
-# BOARD MEASURES
-SQUARE = 110
-TOP = 95
-LEFT = 520
-
-# COLORS
-RED = (217, 0, 8)
-BLUE = (16, 115, 230)
-GREEN = (66, 226, 154)
-YELLOW = (204, 179, 97)
+from settings.settings import *
+from screen.resolution import ResolutionScreen
 
 class Piece:
     """Base class for all pieces"""
@@ -48,7 +38,7 @@ class Piece:
         # IMAGE
         self.path = os.path.dirname(path)
         image_path = functions.resource_path(f'{self.path}/images/redesign/{image}.png')
-        self.image = self.screen.load_image(image_path, color_key='white', scale=5)
+        self.image = self.screen.load_image(image_path, color_key='white', scale=4.75)
 
         # COLORS
         self.color = RED if team=='black' else BLUE

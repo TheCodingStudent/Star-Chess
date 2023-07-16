@@ -1,5 +1,5 @@
 import pygame
-from scripts.ui import Button
+from screen.ui import Button
 
 
 class Menu:
@@ -140,6 +140,9 @@ class TextMenu(Menu):
 
         self.text = pygame.Surface((max_width, max_height))
         self.text.set_colorkey('black')
+        self.background = pygame.Surface((max_width, max_height))
+        self.background.set_alpha(127)
+        self.background.fill('black')
 
         y = 0
         for text in texts:
@@ -153,6 +156,7 @@ class TextMenu(Menu):
         """Draws everything on screen"""
         self.intro.stars.show()
         self.exit_button.show()
+        self.screen.blit(self.background, self.rect)
         self.screen.blit(self.text, self.rect)
         self.screen.blit(self.name, self.name_rect)
 
@@ -196,7 +200,12 @@ class GreetingsMenu(TextMenu):
             " ",
             "Demian Marin",
             "Por hacer el diseño del tablero y darme feedback igualmente,",
-            "por las horas en llamada que pasamos mientras programo"
+            "por las horas en llamada que pasamos mientras programo",
+            " ",
+            "Lia Saenz",
+            "Por ser la primera persona en probar el juego antes de subirlo",
+            "a un repositorio en linea, fue quien me hizo ver que el juego",
+            "no estaba adaptado para diferentes resoluciones."
         ]
 
         super().__init__(screen, intro, lines, 'Agradecimientos')

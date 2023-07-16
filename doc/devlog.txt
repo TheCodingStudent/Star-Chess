@@ -386,3 +386,15 @@
     *   Implemente la partida offline, era molesto crear un server y despues
         unirte, asi que ya se diferencia
     *   Añadi a Lando, Greedo, Commander, los hice de manera rapida
+
+16/07/23
+    12:48am
+    *   Rehice a Darth Vader
+    *   Cambie la escala de personajes de 5 a 4.75
+    *   Hice un nuevo tablero grande, pero no me gusto al final
+    *   Ahora en el folder settings hay un archivo settings.py para guardar
+        variables generales, esto me evita tener que estar buscando y editando
+        variables por todos los archivos.
+        Tambien hace mas sencillo al momento de añadir diferentes tamaños de
+        tablero o quizas en un futuro otros tipos de tablero
+    *   Añadi a Lia a los agradecimientos 

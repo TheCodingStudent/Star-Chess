@@ -2,11 +2,12 @@ import os
 import pygame
 import threading
 import webbrowser
+from screen import ui
 from scripts import board
 from web.server import Server
 from audio.mixer import Mixer
-from scripts import ui, functions
-from scripts.resolution import ResolutionScreen
+from scripts import functions
+from screen.resolution import ResolutionScreen
 from scripts.menu import OptionsMenu, InstructionsMenu, GreetingsMenu, ServerMenu
 
 

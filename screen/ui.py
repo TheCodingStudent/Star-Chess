@@ -114,27 +114,6 @@ class Button:
         else: self.hovered = True
 
 
-class Monitor:
-    def __init__(self, screen: pygame.Surface, path: str, x: int, y: int):
-        path = os.path.dirname(path)
-        font_path = f'{path}/font/pixel.ttf'
-        font_size = 32
-        self.font = pygame.font.Font(font_path, font_size)
-        self.frames = None
-        self.screen = screen
-        self.topleft = (x, y)
-    
-    def update(self, dt: int) -> None:
-        if not dt: return
-        frames = 1000/dt
-        self.frames = self.font.render(f'FPS: {frames:.2f}', True, 'grey')
-        self.frames_rect = self.frames.get_rect(topleft=self.topleft)
-    
-    def show(self) -> None:
-        if not self.frames: return
-        self.screen.blit(self.frames, self.frames_rect)
-
-
 class Particle:
     def __init__(self, screen: pygame.Surface):
         self.screen = screen
@@ -148,7 +127,6 @@ class Particle:
         centerx, centery = width/2, height/2
         self.dir = pygame.Vector2(x, y)
         self.dir.scale_to_length(random.randint(0, centerx))
-        # if self.dir.magnitude
         self.pos = pygame.Vector2(centerx, centery)
 
         # COLOR
