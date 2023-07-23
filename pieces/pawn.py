@@ -1,5 +1,10 @@
 import pygame
+from pieces.rook import Rook
 from pieces.piece import Piece
+from pieces.queen import Queen
+from pieces.knight import Knight
+from pieces.bishop import Bishop
+from settings.settings import GREEN
 
 
 class Pawn(Piece):
@@ -8,6 +13,7 @@ class Pawn(Piece):
         
         # GET IMAGE BASED ON STARTING POSITION
         image = 'rebel' if team == 'white' else 'death trooper'
+        self.main_path = path
         super().__init__(board, screen, path, image, x, y, team, 'PEON')
 
         # PAWN PROPERTIES
@@ -18,10 +24,12 @@ class Pawn(Piece):
         self.moved_twice = False
         self.can_passant = False
 
+        self.promotion_pos = (self.x, 0 if team=='white' else 7)
         self.left_passant = (self.x-1, self.en_passant_row)
         self.right_passant = (self.x+1, self.en_passant_row)
         self.left_passant_end = (self.x-1, self.en_passant_row+self.dir)
         self.right_passant_end = (self.x+1, self.en_passant_row+self.dir)
+        self.promotion_rect = self.get_rect(*self.promotion_pos)
         self.left_passant_rect = self.get_rect(*self.left_passant_end)
         self.right_passant_rect = self.get_rect(*self.right_passant_end)
         self.can_left_passant = False
@@ -63,10 +71,54 @@ class Pawn(Piece):
         """Pawn must update its passant when moved"""
         super().move(pos)
 
-        # UPDATE PASSANT
+        # UPDATE PASSANT AND PROMOTION
+        self.promotion_pos = (self.x, 0 if self.team=='white' else 7)
         self.left_passant = (self.x-1, self.en_passant_row)
         self.right_passant = (self.x+1, self.en_passant_row)
         self.left_passant_end = (self.x-1, self.en_passant_row+self.dir)
         self.right_passant_end = (self.x+1, self.en_passant_row+self.dir)
         self.left_passant_rect = self.get_rect(*self.left_passant_end)
         self.right_passant_rect = self.get_rect(*self.right_passant_end)
+
+        # CHECK IF PROMOTION
+        if (pos == self.promotion_pos) and (not self.board.winner):
+            self.promotion()
+    
+    def promotion(self) -> None:
+        """Opens the UI to promote the pawn"""
+        running = True
+
+        x = 8 if self.team=='white' else -1
+        promotion_piece = None
+        rook = Rook(None, self.screen, self.main_path, x, 2, self.team)
+        queen = Queen(None, self.screen, self.main_path, x, 3, self.team)
+        knight = Knight(None, self.screen, self.main_path, x, 4, self.team)
+        bishop = Bishop(None, self.screen, self.main_path, x, 5, self.team)
+        pieces = (rook, queen, knight, bishop)
+
+        while running:
+            self.screen.fill('black')
+            for event in pygame.event.get():
+                if event.type == pygame.MOUSEBUTTONDOWN:
+                    if rook.click(event): promotion_piece = Rook
+                    elif queen.click(event): promotion_piece = Queen
+                    elif knight.click(event): promotion_piece = Knight
+                    elif bishop.click(event): promotion_piece = Bishop
+                    if promotion_piece: running = False
+                elif event.type == pygame.MOUSEMOTION:
+                    for piece in pieces: piece.hover(event)
+
+            self.board.update()
+            self.board.show()
+
+            self.screen.blit(rook.promotion_color, rook.rect)
+            self.screen.blit(queen.promotion_color, queen.rect)
+            self.screen.blit(knight.promotion_color, knight.rect)
+            self.screen.blit(bishop.promotion_color, bishop.rect)
+
+            for piece in pieces: piece.show()
+
+            pygame.display.update()
+            self.board.tick()
+        
+        self.board.promote(self, promotion_piece)

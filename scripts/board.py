@@ -170,11 +170,10 @@ class Board:
         # self.kill(end)
         # time.sleep(0.1)
         selected_piece = self.board[y0][x0]
+        self.board[y0][x0], self.board[y1][x1] = self.board[y1][x1], self.board[y0][x0]
         print(f'{selected_piece=}')
         selected_piece.move((x1, y1))
         print(f'{selected_piece=}')
-        # SWAP THE PIECE AND CHANGE TURN IF NEEDED
-        self.board[y0][x0], self.board[y1][x1] = self.board[y1][x1], self.board[y0][x0]
     
     def hover(self, event: pygame.event) -> None:
         """Manages the logic for hovering the board or piece"""
@@ -183,7 +182,7 @@ class Board:
         for piece in current_pieces:
             piece.hover(event)
     
-    def update(self) -> None:
+    def update(self, dt: int=0) -> None:
         """Updates all the visual elements"""
         self.left_stars.update(self.dt)
         self.right_stars.update(self.dt)
@@ -447,6 +446,23 @@ class Board:
             self.show()
             pygame.display.update()
             self.dt = self.clock.tick(self.fps)
+        
+    def tick(self) -> None:
+        """Ticks the clock"""
+        self.dt = self.clock.tick(self.fps)
+    
+    def promote(self, pawn, promotion_piece) -> None:
+        """Promotes a pawn"""
+        screen = self.screen.screen
+
+        # print(self)
+        x, y = pawn.x, pawn.y
+        self.kill(x, y)
+        new_piece = promotion_piece(self, screen, self.path, x, y, self.current)
+        if self.current == 'white': self.white_pieces.append(new_piece)
+        elif self.current == 'black': self.black_pieces.append(new_piece)
+        self.all_pieces.append(new_piece)
+        self.board[y][x] = new_piece
 
     def intro(self) -> None:
         """Loop for the intro animation"""
@@ -493,10 +509,13 @@ class Board:
                 piece.show()
 
             pygame.display.update()
-            self.dt = self.clock.tick(self.fps)
+            self.tick()
             time += self.dt
         
         self.main()
+    
+    def __repr__(self) -> str:
+        return '\n'.join([' '.join([str(column) for column in row]) for row in self.board])
 
 
 class OfflineBoard(Board):

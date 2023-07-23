@@ -432,3 +432,18 @@
         -   Coronacion
         -   Jaque
         -   Jaque mate
+
+23/07/23
+    2:56pm
+    *   Empezare con la coronacion
+    *   No me habia percatado de lo especial que es el peon
+
+    4:15pm
+    *   Ahora se despliega una interfaz para que se escoja una pieza para
+        promover el peon
+    *   Ahora en el extraño caso de que un peon capturara al rey en la fila
+        de coronacion ya no se activa la interfaz
+    *   Pendientes
+        -   Jaque
+        -   Jaque mate
+        Creo que trabajare en el Jaque

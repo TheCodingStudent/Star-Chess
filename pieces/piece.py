@@ -45,6 +45,7 @@ class Piece:
         self.color = RED if team=='black' else BLUE
         self.hover_color = self.alpha_rect(YELLOW, 0.5)
         self.move_color = self.alpha_rect(self.color, 0.3)
+        self.promotion_color = self.alpha_rect(self.color, 0.5)
         self.select_color = self.alpha_rect(self.color, 1)
 
         # RECT
@@ -173,4 +174,4 @@ class Piece:
         return self.board.in_attack(pos)
 
     def __repr__(self) -> None:
-        return f'({self.x}, {self.y}), {self.team}'
+        return f'(({self.x}, {self.y}), {self.team})'
