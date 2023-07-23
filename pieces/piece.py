@@ -1,4 +1,5 @@
 import os
+import math
 import pygame
 from scripts import functions
 from settings.settings import *
@@ -91,14 +92,12 @@ class Piece:
 
     def get_rect(self, x: int, y: int) -> pygame.Rect:
         """Gets the rect to position the piece"""
-        # return self.screen.get_rect(self.image, )
-        left = self.screen.convert(x*SQUARE+LEFT)
-        top = self.screen.convert(y*SQUARE+TOP)
+        left = math.ceil(self.screen.convert(x*SQUARE+LEFT))
+        top = math.ceil(self.screen.convert(y*SQUARE+TOP))
         return self.move_color.get_rect(topleft=(left, top))
 
     def move(self, pos: tuple[int, int]) -> None:
         """Moves the piece and updates itself and the board"""
-        # self.board.move((self.x, self.y), pos, change_turn)
         print(f'moving piece to {pos=}')
         self.x, self.y = pos
         self.get_name_rect()
@@ -106,6 +105,7 @@ class Piece:
         self.selected = False
         if not self.moved: self.moved = True
 
+        # CENTER PIECE
         centerx = ((self.x+0.5)*SQUARE+LEFT) * self.screen.ratio
         bottom = ((self.y+1)*SQUARE+TOP) * self.screen.ratio
         self.image_rect = self.image.get_rect(centerx=centerx, bottom=bottom)
@@ -143,7 +143,7 @@ class Piece:
 
     def alpha_rect(self, color: str|tuple[int, int, int], alpha: float) -> pygame.Surface:
         """Creates a surface with an alpha channel for transparency"""
-        size = self.screen.convert(SQUARE)
+        size = math.ceil(self.screen.convert(SQUARE))
         surface = pygame.Surface((size, size), pygame.SRCALPHA)
         surface.set_alpha(int(255*alpha))
         surface.fill(color)

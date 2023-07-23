@@ -414,3 +414,21 @@
         (error de escala)
     *   Ya despues subo al repositorio
     *   Bueno, sera de una vez
+
+    2:48pm
+    *   Ajuste las medidas de las piezas al momento de escalar para que los
+        movimientos y seleccion quede de acuerdo al tablero (error de redondeo)
+
+    2:59pm
+    *   Tengo planeado avanzar con la coronacion
+    *   De momento jugare minecraft con Demian
+
+22/07/23
+    11:23pm
+    *   He estado haciendo experimentos con librerias y haciendo interfaces,
+        asi que no he estado activo con el ajedrez, de momento unicamente
+        elimine algunas lineas de codigo que ya no eran necesarias.
+    *   Pendientes:
+        -   Coronacion
+        -   Jaque
+        -   Jaque mate
