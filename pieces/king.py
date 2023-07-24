@@ -68,6 +68,9 @@ class King(Piece):
 
     def show(self) -> None:
         """Draws the piece on screen"""
+        # if self.blocked: self.image.set_alpha(63)
+        # else: self.image.set_alpha(255)
+
         if self.selected: self.screen.blit(self.select_color, self.rect)
         elif self.hovered: self.screen.blit(self.hover_color, self.rect)
         elif self.in_check: self.screen.blit(self.check_color, self.rect)

@@ -485,3 +485,20 @@
         solo es cuestion de copiar funciones y ya
     *   El jaque no detecta la opcion de comer piezas para evitar el mate
     *   Me ire a dormir
+
+24/07/23
+    2:25pm
+    *   Hoy mi cuerpo me abandono y amaneci todo rojo, asi que trabajaremos
+        calmados
+    *   Ya actualice el jaque para que tambien pueda comer piezas y evitar el
+        mate, se me ocurrio ayer en la noche mientras hablaba con Javier
+    *   Se me hace una buena idea agregar algun indicador de pieza clavada
+
+    2:43pm
+    *   Resolvi lo de los movimientos fantasmas
+
+    2:56pm
+    *   Arregle algunos detalles de actualizar los estados
+    *   Parece ser que ya tenemos un ajedrez completo! (hablando de mecanicas)
+    *   No me gusta casi como se ve el bloqueo de piezas, aunque creo que tengo
+        una idea

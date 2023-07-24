@@ -128,7 +128,7 @@ class Board:
         self.confeti.reset()
 
     # HELPING METHODS
-    def win(self, real_winner: str) -> None:
+    def win(self, real_winner: str='') -> None:
         """Updates the winner"""
 
         # GET MESSAGE
@@ -149,10 +149,13 @@ class Board:
     def change_turn(self) -> None:
         """Manages the logic of changing turn"""
         last_turn = self.current
+        pieces = getattr(self, f'{self.current}_pieces')
+        for piece in pieces: piece.reset()
+
         self.current = 'black' if self.current == 'white' else 'white'
         self.turn_anim.reset()
         self.get_possible_moves()
-        if not (self.white_moves_rects or self.black_moves_rects):
+        if not getattr(self, f'{self.current}_moves_rects'):
             self.win(last_turn)
 
     def kill(self, x: int, y: int) -> None:
@@ -185,18 +188,25 @@ class Board:
 
     def get_possible_moves(self) -> None:
         self.white_moves_rects.clear()
+        self.get_white_moves()
+        for white_piece in self.white_pieces:
+            self.white_moves_rects.extend(white_piece.possible_moves_rects)
+        
         self.black_moves_rects.clear()
-
-        pieces = getattr(self, f'{self.current}_pieces')
-        getattr(self, f'get_{self.current}_moves')()
-        rects = list()
-        for piece in pieces: rects.extend(piece.possible_moves_rects)
-
-        if self.current == 'white': self.white_moves_rects = rects
-        else: self.black_moves_rects = rects
+        self.get_black_moves()
+        for black_piece in self.black_pieces:
+            self.black_moves_rects.extend(black_piece.possible_moves_rects)
 
         self.white_king.in_check = self.white_king.rect in self.black_moves_rects
         self.black_king.in_check = self.black_king.rect in self.white_moves_rects
+
+        for white_piece in self.white_pieces:
+            if not self.white_king.in_check: continue
+            if not white_piece.possible_moves: white_piece.blocked = True
+
+        for black_piece in self.black_pieces:
+            if not self.black_king.in_check: continue
+            if not black_piece.possible_moves: black_piece.blocked = True
 
     def move(self, x0: int, y0: int, x1: int, y1: int) -> None:
         """Manages the logic of moving a piece"""
@@ -280,9 +290,10 @@ class Board:
         self.exit_button.show()
     
         # DEBUG
-        rects = getattr(self, f'{self.current}_moves_rects')
-        color = getattr(self, f'{self.current}_move_color')
-        for rect in rects: self.screen.blit(color, rect)
+        # enemy = 'black' if self.current=='white' else 'white'
+        # rects = getattr(self, f'{enemy}_moves_rects')
+        # color = getattr(self, f'{enemy}_move_color')
+        # for rect in rects: self.screen.blit(color, rect)
         
         # SHOW WINNER
         if not self.winner: return
@@ -393,12 +404,17 @@ class Board:
         # CHECKS CLICK ON PIECE
         for piece in current_pieces:
             if not piece.click(event): continue
+            if piece.blocked: continue
             self.selected = piece
             self.selected.calculate_moves()
             return self.selected.check_legal()
 
     def main(self) -> None:
         """Main loop of the board"""
+
+        for piece in self.all_pieces:
+            piece.calculate_moves()
+            piece.check_legal()
 
         # MAIN LOOP
         while self.running:

@@ -20,6 +20,7 @@ class Piece:
         self.enemy = 'black' if team=='white' else 'white'
         self.moved = False
         self.hovered = False
+        self.blocked = False
         self.selected = False
         self.x, self.y = x, y
         self.possible_moves: list[pygame.Vector2] = list()
@@ -47,6 +48,7 @@ class Piece:
         self.hover_color = self.alpha_rect(YELLOW, 0.5)
         self.move_color = self.alpha_rect(self.color, 0.3)
         self.promotion_color = self.alpha_rect(self.color, 0.5)
+        self.block_color = self.alpha_rect(RED, 1)
         self.select_color = self.alpha_rect(self.color, 1)
 
         # RECT
@@ -63,6 +65,9 @@ class Piece:
 
         # FLAGS
         self.flag = None
+
+    def reset(self) -> None:
+        self.blocked = False
 
     def check_flag(self) -> None:
         """Applies the function marked as flag"""
@@ -125,6 +130,8 @@ class Piece:
 
     def show(self) -> None:
         """Draws the piece on screen"""
+        if self.blocked: self.image.set_alpha(63)
+        else: self.image.set_alpha(255)
         if self.selected: self.screen.blit(self.select_color, self.rect)
         elif self.hovered: self.screen.blit(self.hover_color, self.rect)
         self.screen.blit(self.image, self.image_rect)
@@ -167,23 +174,41 @@ class Piece:
 
         # BOARD
         board = self.board.board
+        capture_piece = None
 
         # KING PROPERTIES
         king = getattr(self.board, f'{self.team}_king')
         x0, y0 = self.x, self.y
         x1, y1 = move
 
+        # CHECK IF CAPTURING MOVE
+        if not self.available(move):
+            capture_piece = board[y1][x1]
+            enemy_pieces = getattr(self.board, f'{self.enemy}_pieces')
+            enemy_pieces.remove(capture_piece)
+            board[y1][x1] = None
+
         # SIMULATE MOVE AND ENEMY POSSIBLE MOVES
+        self.x, self.y = move
         board[y0][x0], board[y1][x1] = board[y1][x1], board[y0][x0]
         enemy_moves = getattr(self.board, f'get_{self.enemy}_moves')(check_legal=False)
+        self.x, self.y = x0, y0
         board[y0][x0], board[y1][x1] = board[y1][x1], board[y0][x0]
+
+        # REVERSE CAPTURE
+        if capture_piece:
+            board[y1][x1] = capture_piece
+            enemy_pieces = getattr(self.board, f'{self.enemy}_pieces')
+            enemy_pieces.append(capture_piece)
 
         # RETURN IF THE KING IS SAFE AFTER THE MOVE
         return not ((king.x, king.y) in enemy_moves)
 
     def check_legal(self) -> None:
         """Filters the illegal moves"""
+        if not self.possible_moves: return
         self.possible_moves = [move for move in self.possible_moves.copy() if self.is_legal(move)]
+        self.blocked = len(self.possible_moves) == 0
         self.calculate_moves_rects()
 
     def check_moves(self, moves: list[tuple[int, int]]) -> None:
