@@ -32,3 +32,4 @@ GREY = pygame.Vector3(65, 63, 65)
 BLUE = pygame.Vector3(16, 115, 230)
 GREEN = pygame.Vector3(66, 226, 154)
 YELLOW = pygame.Vector3(204, 179, 97)
+MAGENTA = 0.5*RED + 0.5*BLUE

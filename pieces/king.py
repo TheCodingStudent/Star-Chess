@@ -14,6 +14,7 @@ class King(Piece):
 
         # PROPERTIES
         self.in_check = False
+        self.check_color = self.alpha_rect('red', 1)
 
         # CASTLING
         self.can_left_castling = False
@@ -27,6 +28,15 @@ class King(Piece):
         self.left_castling_rect = self.get_rect(*self.left_castling)
         self.right_castling_rect = self.get_rect(*self.right_castling)
     
+    def is_legal(self, move: tuple[int, int]) -> bool:
+        """Checks if the given move is legal"""
+
+        # GET POSSIBLE MOVES
+        enemy_moves = getattr(self.board, f'get_{self.enemy}_moves')(check_legal=False)
+
+        # RETURN IF THE KING MOVE CHECKS IT
+        return not (move in enemy_moves)
+
     def calculate_moves(self) -> None:
         """Updates the list of possible moves"""
         self.possible_moves.clear()
@@ -56,6 +66,12 @@ class King(Piece):
         self.can_right_castling = self.check_castling(self.right_rook)
         if self.can_right_castling: self.possible_moves.append(self.right_castling)
 
+    def show(self) -> None:
+        """Draws the piece on screen"""
+        if self.selected: self.screen.blit(self.select_color, self.rect)
+        elif self.hovered: self.screen.blit(self.hover_color, self.rect)
+        elif self.in_check: self.screen.blit(self.check_color, self.rect)
+        self.screen.blit(self.image, self.image_rect)
     
     def check_castling(self, rook_pos: tuple[int, int]) -> bool:
         """Updates the list of possible moves with castling"""

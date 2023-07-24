@@ -17,6 +17,7 @@ class Piece:
 
         # PIECE PROPERTIES
         self.team = team
+        self.enemy = 'black' if team=='white' else 'white'
         self.moved = False
         self.hovered = False
         self.selected = False
@@ -99,7 +100,6 @@ class Piece:
 
     def move(self, pos: tuple[int, int]) -> None:
         """Moves the piece and updates itself and the board"""
-        print(f'moving piece to {pos=}')
         self.x, self.y = pos
         self.get_name_rect()
         self.rect = self.get_rect(self.x, self.y)
@@ -161,6 +161,30 @@ class Piece:
     def available(self, pos: tuple[int, int]) -> bool:
         """Checks if the given position if available on the board"""
         return self.board.available(pos)
+
+    def is_legal(self, move: tuple[int, int]) -> bool:
+        """Checks if the given move is legal"""
+
+        # BOARD
+        board = self.board.board
+
+        # KING PROPERTIES
+        king = getattr(self.board, f'{self.team}_king')
+        x0, y0 = self.x, self.y
+        x1, y1 = move
+
+        # SIMULATE MOVE AND ENEMY POSSIBLE MOVES
+        board[y0][x0], board[y1][x1] = board[y1][x1], board[y0][x0]
+        enemy_moves = getattr(self.board, f'get_{self.enemy}_moves')(check_legal=False)
+        board[y0][x0], board[y1][x1] = board[y1][x1], board[y0][x0]
+
+        # RETURN IF THE KING IS SAFE AFTER THE MOVE
+        return not ((king.x, king.y) in enemy_moves)
+
+    def check_legal(self) -> None:
+        """Filters the illegal moves"""
+        self.possible_moves = [move for move in self.possible_moves.copy() if self.is_legal(move)]
+        self.calculate_moves_rects()
 
     def check_moves(self, moves: list[tuple[int, int]]) -> None:
         """Checks if the given list of moves is legal"""

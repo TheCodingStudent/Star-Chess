@@ -447,3 +447,41 @@
         -   Jaque
         -   Jaque mate
         Creo que trabajare en el Jaque
+    
+    4:57pm
+    *   Mejor ire a descansar
+
+    6:32pm
+    *   Me pondre 30 minutos para ver que hago en ese tiempo, despues me ire a
+        bañar.
+    
+    7:11pm
+    *   Me pase por 11 minutos, pero el jaque ya funciona, bueno, la deteccion
+        de estar en jaque, ahora falta filtrar los movimientos legales.
+    *   Papa se acaba de meter al baño asi que me bañare despues de el
+
+    8:30pm
+    *   Al final no me bañe
+    *   Seguire trabajando
+    *   Empiezo a entender por que habia postergado el jaque
+
+    9:03pm
+    *   De momento parece que el jaque te previene de que ataquen a tu rey
+        despues de tu movimiento, lo que conozco como Clavado
+    
+    9:40pm
+    *   Hay avances con el jaque, parece que ya funciona, habia un problema de
+        recursion pero lo resolvi con un parametro "check_legal" y asi evito
+        la recursion
+    *   Habia un error en el passant, no se checaba si la pieza de los lados
+        era un peon, ya esta arreglado
+    *   Al parecer puedes moverte a un lugar ilegal, aunque no se muestra en el
+        juego
+    *   Ya esta listo el jaque mate y depende del jaque, asi que en dado caso
+        tendre que seguir probando y actualizar el jaque
+    
+    10:01pm
+    *   Me di cuenta de que falta cambiar tambien el tablero online, pero ya
+        solo es cuestion de copiar funciones y ya
+    *   El jaque no detecta la opcion de comer piezas para evitar el mate
+    *   Me ire a dormir

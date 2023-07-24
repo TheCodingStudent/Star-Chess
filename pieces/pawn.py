@@ -58,6 +58,8 @@ class Pawn(Piece):
         # EN PASSANT
         if self.y != self.en_passant_row: return
         left_passant = self.board.get(self.left_passant)
+        if not hasattr(left_passant, 'moved_twice'): return
+        
         if left_passant and left_passant.moved_twice and self.allow_left_passant:
             self.possible_moves.append(self.left_passant_end)
             self.can_left_passant = True
